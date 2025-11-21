@@ -15,4 +15,11 @@ app.use(express.urlencoded({ extended: true })); // to retrive data from URL
 app.use(cookieParser()); // to parse OR CRUD operations of cookies
 app.use(express.static("public")); // to serve static files such as images, CSS files, and JavaScript files
 
+// Importing routes
+import patientRouter from "./routes/patient.routes.js";
+
+// Mounting routes
+app.use("/api/patients", patientRouter);
+
+
 export default app;
