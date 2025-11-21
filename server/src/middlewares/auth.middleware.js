@@ -34,7 +34,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
       throw new ApiError(401, "Access Denied: Invalid Token role");
     }
 
-    const user = await Model.findById(decoded?._id).select(
+    const user = await Model.findById(_id).select(
       "-password -refreshToken"
     );
 

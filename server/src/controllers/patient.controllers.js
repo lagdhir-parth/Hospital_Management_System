@@ -133,7 +133,7 @@ const loginPatient = asyncHandler(async (req, res) => {
   }
 
   const { accessToken, refreshToken } =
-    await generateAccessTokenAndRefreshToken(user._id);
+    await generateAccessTokenAndRefreshToken(user._id, "patient");
 
   const loggedInPatient = await Patient.findById(user._id).select(
     "-password -refreshToken"

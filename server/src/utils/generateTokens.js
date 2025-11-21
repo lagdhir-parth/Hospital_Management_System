@@ -1,14 +1,25 @@
 import ApiError from "./apiError.js";
 import Patient from "../models/patient.model.js";
+import Doctor from "../models/doctor.model.js";
 
-const generateAccessTokenAndRefreshToken = async (patientID) => {
+const generateAccessTokenAndRefreshToken = async (userID, role) => {
+  const modelMap = {
+    patient: Patient,
+    doctor: Doctor,
+  };
+
+  const Model = modelMap[role];
+  if (!Model) {
+    throw new ApiError(400, "Invalid role provided for token generation");
+  }
+
   try {
-    const patient = await Patient.findById(patientID);
-    const accessToken = patient.generateAccessToken();
-    const refreshToken = patient.generateRefreshToken();
+    const user = await Model.findById(userID);
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
 
-    patient.refreshToken = refreshToken;
-    await patient.save({ validateBeforeSave: false });
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiError(500, "Error generating tokens");

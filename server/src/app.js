@@ -17,9 +17,17 @@ app.use(express.static("public")); // to serve static files such as images, CSS 
 
 // Importing routes
 import patientRouter from "./routes/patient.routes.js";
+import doctorRouter from "./routes/doctor.routes.js";
+import departmentRouter from "./routes/department.routes.js";
+import refreshAccessToken from "./middlewares/refreshAccessToken.middleware.js";
 
 // Mounting routes
 app.use("/api/patients", patientRouter);
+app.use("/api/doctors", doctorRouter);
+app.use("/api/departments", departmentRouter);
 
+
+
+app.get("/api/:role/refresh-token", refreshAccessToken);
 
 export default app;

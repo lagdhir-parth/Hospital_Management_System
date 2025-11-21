@@ -22,6 +22,10 @@ const doctorSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    mobileNumber: {
+      type: String,
+      required: true,
+    },
     specialization: {
       type: String,
       required: true,
@@ -33,6 +37,7 @@ const doctorSchema = new mongoose.Schema(
     yearsOfExperience: {
       type: Number,
       required: false,
+      default: 0,
     },
     treatedPatients: {
       type: Number,
@@ -50,7 +55,7 @@ const doctorSchema = new mongoose.Schema(
       type: [String], // e.g., ["Monday 9-11am", "Wednesday 2-4pm"]
       required: false,
     },
-    departmentID: {
+    department: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Department",
       required: true,
