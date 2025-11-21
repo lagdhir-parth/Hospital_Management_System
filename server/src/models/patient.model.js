@@ -91,6 +91,7 @@ patientSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
+      role: "patient",
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
@@ -103,6 +104,7 @@ patientSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
       _id: this._id,
+      role: "patient",
     },
     process.env.REFRESH_TOKEN_SECRET,
     {

@@ -91,6 +91,7 @@ doctorSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
+      role: "doctor",
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
@@ -103,6 +104,7 @@ doctorSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
       _id: this._id,
+      role: "doctor",
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
