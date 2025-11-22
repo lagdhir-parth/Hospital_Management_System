@@ -2,6 +2,13 @@ import {
   registerPatient,
   loginPatient,
   patientLogout,
+  currentPatient,
+  getPatientById,
+  getAllPatients,
+  deletePatient,
+  updateProfilePic,
+  updateProfile,
+  updateDiagnosesAndAllergies,
 } from "../controllers/patient.controllers.js";
 import { Router } from "express";
 import upload from "../middlewares/multer.middleware.js";
@@ -15,7 +22,24 @@ router.route("/register").post(upload.single("profilePic"), registerPatient);
 // by using multer.none() to parse only fields (no files).
 router.route("/login").post(upload.none(), loginPatient);
 
+// Place specific routes before parameterized routes so they are matched first
+router.route("/allPatients").get(getAllPatients);
+router.route("/find/:id").get(getPatientById); // put in under all patients route otherwise 'allPatients' is treated as id
+
 // Protected routes
 router.route("/logout").post(verifyJWT, patientLogout);
+router.route("/currentPatient").get(verifyJWT, currentPatient);
+
+router
+  .route("/updateProfilePic")
+  .patch(verifyJWT, upload.single("profilePic"), updateProfilePic);
+
+router
+  .route("/updateProfile")
+  .patch(verifyJWT, upload.none(), updateProfile);
+
+router
+  .route("/updateDiagnosesAndAllergies")
+  .patch(verifyJWT, upload.none(), updateDiagnosesAndAllergies);
 
 export default router;

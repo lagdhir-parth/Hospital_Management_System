@@ -1,4 +1,5 @@
 import Patient from "../models/patient.model.js";
+import mongoose from "mongoose";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
@@ -174,4 +175,180 @@ const patientLogout = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerPatient, loginPatient, patientLogout };
+const currentPatient = asyncHandler(async (req, res) => {
+  const patient = await Patient.findById(req.user._id).select(
+    "-password -refreshToken"
+  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, "Current patient fetched successfully", patient)
+    );
+});
+
+const getPatientById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // validate ObjectId to avoid CastError when a non-objectId string is passed
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400);
+    throw new ApiError(400, "Invalid patient id");
+  }
+
+  const patient = await Patient.findById(id).select("-password -refreshToken");
+
+  if (!patient) {
+    res.status(404);
+    throw new ApiError(404, "Patient not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Patient fetched successfully", patient));
+});
+
+const getAllPatients = asyncHandler(async (req, res) => {
+  const patients = await Patient.find().select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Patients fetched successfully", patients));
+});
+
+const deletePatient = asyncHandler(async (req, res) => {
+  const role = req.role;
+  if (role !== "admin") {
+    res.status(403);
+    throw new ApiError(403, "Only admin can delete patients");
+  }
+
+  const id = req.params.id;
+
+  // validate ObjectId to avoid CastError when a non-objectId string is passed
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400);
+    throw new ApiError(400, "Invalid patient id");
+  }
+
+  const deletedPatient = await Patient.findByIdAndDelete(id);
+
+  if (!deletedPatient) {
+    res.status(404);
+    throw new ApiError(404, "Patient not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Patient deleted successfully", deletedPatient));
+});
+
+const updateProfilePic = asyncHandler(async (req, res) => {
+  const patientId = req.user._id;
+
+  if (!patientId) {
+    res.status(400);
+    throw new ApiError(400, "Patient id is required to change profile picture");
+  }
+
+  if (!req.file) {
+    res.status(400);
+    throw new ApiError(400, "Profile picture is required");
+  }
+
+  const profilePicUrl = await uploadOnCloudinary(req.file?.path);
+
+  if (!profilePicUrl) {
+    res.status(500);
+    throw new ApiError(500, "Error uploading profile picture to cloudinary");
+  }
+
+  const updatedPatient = await Patient.findByIdAndUpdate(
+    patientId,
+    { profilePic: profilePicUrl },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        "Profile picture updated successfully",
+        updatedPatient
+      )
+    );
+});
+
+const updateProfile = asyncHandler(async (req, res) => {
+  const patientId = req.user._id;
+  const updateData = req.body;
+  const allowedUpdates = ["name", "mobile_no", "email", "address"];
+
+  if (Object.keys(updateData).length === 0) {
+    res.status(400);
+    throw new ApiError(400, "Please provide data to update");
+  }
+
+  // Validate update fields
+  const updates = Object.keys(updateData);
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+
+  if (!isValidOperation) {
+    res.status(400);
+    throw new ApiError(400, "Invalid updates!");
+  }
+
+  const updatedPatient = await Patient.findByIdAndUpdate(
+    patientId,
+    updateData,
+    { new: true, runValidators: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Profile updated successfully", updatedPatient));
+});
+
+const updateDiagnosesAndAllergies = asyncHandler(async (req, res) => {
+  const patientId = req.user._id;
+  const { diagnoses, allergies } = req.body || {};
+
+  if (!diagnoses && !allergies) {
+    res.status(400);
+    throw new ApiError(400, "Please provide diagnoses or allergies to update");
+  }
+
+  const updatedPatient = await Patient.findByIdAndUpdate(
+    patientId,
+    {
+      diagnoses: diagnoses ? diagnoses.split(",").map((d) => d.trim()) : [],
+      allergies: allergies ? allergies.split(",").map((a) => a.trim()) : [],
+    },
+    { new: true, runValidators: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        "Diagnoses and allergies updated successfully",
+        updatedPatient
+      )
+    );
+});
+
+export {
+  registerPatient,
+  loginPatient,
+  patientLogout,
+  currentPatient,
+  getPatientById,
+  getAllPatients,
+  deletePatient,
+  updateProfilePic,
+  updateProfile,
+  updateDiagnosesAndAllergies,
+};

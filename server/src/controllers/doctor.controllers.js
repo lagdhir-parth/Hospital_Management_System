@@ -168,4 +168,6 @@ const logoutDoctor = asyncHandler(async (req, res) => {
     );
 });
 
+
+
 export { registerDoctor, loginDoctor, logoutDoctor };

@@ -17,6 +17,7 @@ const uploadOnCloudinary = async (localFilePath) => {
 
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
+      folder: "hospital_management_system/patients",
     });
 
     //console.log("file is uploaded on cloudinary", response.url);
