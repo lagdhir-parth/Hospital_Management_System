@@ -51,6 +51,10 @@ const doctorSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    profilePicPublicId: {
+      type: String,
+      required: false,
+    },
     availability: {
       type: [String], // e.g., ["Monday 9-11am", "Wednesday 2-4pm"]
       required: false,

@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
+import uploadOnCloudinary, {
+  deleteFromCloudinary,
+} from "../utils/cloudinary.js";
 import generateAccessTokenAndRefreshToken from "../utils/generateTokens.js";
 
 const cookieOptions = {
@@ -73,9 +75,12 @@ const registerPatient = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Profile picture is required");
   }
   // upload profile pic to cloudinary
-  const profilePicUrl = await uploadOnCloudinary(req.file?.path);
+  const profilePic = await uploadOnCloudinary(
+    req.file?.path,
+    "hospital_management_system/patients"
+  );
 
-  if (!profilePicUrl) {
+  if (!profilePic) {
     res.status(500);
     throw new ApiError(500, "Error uploading profile picture to cloudinary");
   }
@@ -92,7 +97,8 @@ const registerPatient = asyncHandler(async (req, res) => {
     gender,
     diagnoses: diagnoses ? diagnoses.split(",").map((d) => d.trim()) : [],
     allergies: allergies ? allergies.split(",").map((a) => a.trim()) : [],
-    profilePic: profilePicUrl,
+    profilePic: profilePic.url,
+    profilePicPublicId: profilePic.public_id,
     address,
   });
 
@@ -179,6 +185,12 @@ const currentPatient = asyncHandler(async (req, res) => {
   const patient = await Patient.findById(req.user._id).select(
     "-password -refreshToken"
   );
+
+  if (!patient) {
+    res.status(404);
+    throw new ApiError(404, "Patient not found");
+  }
+
   return res
     .status(200)
     .json(
@@ -215,33 +227,6 @@ const getAllPatients = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Patients fetched successfully", patients));
 });
 
-const deletePatient = asyncHandler(async (req, res) => {
-  const role = req.role;
-  if (role !== "admin") {
-    res.status(403);
-    throw new ApiError(403, "Only admin can delete patients");
-  }
-
-  const id = req.params.id;
-
-  // validate ObjectId to avoid CastError when a non-objectId string is passed
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    res.status(400);
-    throw new ApiError(400, "Invalid patient id");
-  }
-
-  const deletedPatient = await Patient.findByIdAndDelete(id);
-
-  if (!deletedPatient) {
-    res.status(404);
-    throw new ApiError(404, "Patient not found");
-  }
-
-  return res
-    .status(200)
-    .json(new ApiResponse(200, "Patient deleted successfully", deletedPatient));
-});
-
 const updateProfilePic = asyncHandler(async (req, res) => {
   const patientId = req.user._id;
 
@@ -255,16 +240,42 @@ const updateProfilePic = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Profile picture is required");
   }
 
-  const profilePicUrl = await uploadOnCloudinary(req.file?.path);
+  const patient = await Patient.findById(patientId);
+  if (!patient) {
+    res.status(404);
+    throw new ApiError(404, "Patient not found");
+  }
 
-  if (!profilePicUrl) {
+  if (patient.profilePicPublicId) {
+    try {
+      const delResult = await deleteFromCloudinary(patient.profilePicPublicId);
+      if (!delResult) {
+        console.warn(
+          "Cloudinary deletion returned unexpected result:",
+          delResult
+        );
+      }
+    } catch (err) {
+      console.error("Error deleting old profile pic from Cloudinary:", err);
+    }
+  }
+
+  const uploadedProfilePic = await uploadOnCloudinary(
+    req.file?.path,
+    "hospital_management_system/patients"
+  );
+
+  if (!uploadedProfilePic) {
     res.status(500);
     throw new ApiError(500, "Error uploading profile picture to cloudinary");
   }
 
   const updatedPatient = await Patient.findByIdAndUpdate(
     patientId,
-    { profilePic: profilePicUrl },
+    {
+      profilePic: uploadedProfilePic.url,
+      profilePicPublicId: uploadedProfilePic.public_id,
+    },
     { new: true }
   ).select("-password -refreshToken");
 
@@ -340,6 +351,31 @@ const updateDiagnosesAndAllergies = asyncHandler(async (req, res) => {
     );
 });
 
+const deleteProfile = asyncHandler(async (req, res) => {
+  const patientId = req.user._id;
+
+  const patient = await Patient.findById(patientId);
+  if (!patient) {
+    res.status(404);
+    throw new ApiError(404, "Patient not found");
+  }
+
+  deleteFromCloudinary(patient.profilePicPublicId).catch((err) => {
+    console.error("Error deleting profile pic from Cloudinary:", err);
+  });
+
+  const deletedPatient = await Patient.findByIdAndDelete(patientId);
+
+  if (!deletedPatient) {
+    res.status(404);
+    throw new ApiError(404, "Patient not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Patient deleted successfully", deletedPatient));
+});
+
 export {
   registerPatient,
   loginPatient,
@@ -347,8 +383,8 @@ export {
   currentPatient,
   getPatientById,
   getAllPatients,
-  deletePatient,
   updateProfilePic,
   updateProfile,
   updateDiagnosesAndAllergies,
+  deleteProfile,
 };

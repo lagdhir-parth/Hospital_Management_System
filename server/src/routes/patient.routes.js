@@ -5,7 +5,7 @@ import {
   currentPatient,
   getPatientById,
   getAllPatients,
-  deletePatient,
+  deleteProfile,
   updateProfilePic,
   updateProfile,
   updateDiagnosesAndAllergies,
@@ -41,5 +41,8 @@ router
 router
   .route("/updateDiagnosesAndAllergies")
   .patch(verifyJWT, upload.none(), updateDiagnosesAndAllergies);
+router
+  .route("/deleteProfile")
+  .delete(verifyJWT, deleteProfile);
 
 export default router;

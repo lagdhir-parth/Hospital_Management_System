@@ -54,6 +54,10 @@ const patientSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    profilePicPublicId: {
+      type: String,
+      required: false,
+    },
     address: {
       type: String,
       required: true,
