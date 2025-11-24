@@ -7,6 +7,7 @@ import uploadOnCloudinary, {
   deleteFromCloudinary,
 } from "../utils/cloudinary.js";
 import generateAccessTokenAndRefreshToken from "../utils/generateTokens.js";
+import fs from "fs";
 
 const cookieOptions = {
   httpOnly: true,
@@ -46,6 +47,7 @@ const registerDoctor = asyncHandler(async (req, res) => {
       availability,
     ].some((field) => field?.trim() === "")
   ) {
+    fs.unlinkSync(req.file.path);
     res.status(400);
     throw new ApiError(400, "Please fill all the required fields");
   }
@@ -53,6 +55,7 @@ const registerDoctor = asyncHandler(async (req, res) => {
   //check existed doctor
   const existedDoctor = await Doctor.findOne({ username });
   if (existedDoctor) {
+    fs.unlinkSync(req.file.path);
     res.status(400);
     throw new ApiError(400, "Username is already taken");
   }
@@ -217,6 +220,15 @@ const getAllDoctors = asyncHandler(async (req, res) => {
 const updateProfilePic = asyncHandler(async (req, res) => {
   const doctorId = req.user._id;
 
+  if (req.role !== "doctor") {
+    fs.unlinkSync(req.file.path);
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden! Only doctors can update their profile picture"
+    );
+  }
+
   if (!doctorId) {
     res.status(400);
     throw new ApiError(400, "Doctor ID is required");
@@ -287,6 +299,11 @@ const updateProfilePic = asyncHandler(async (req, res) => {
 const updateProfile = asyncHandler(async (req, res) => {
   const doctorId = req.user._id;
 
+  if (req.role !== "doctor") {
+    res.status(403);
+    throw new ApiError(403, "Forbidden! Only doctors can update their profile");
+  }
+
   if (!doctorId) {
     res.status(400);
     throw new ApiError(400, "Doctor ID is required");
@@ -332,6 +349,14 @@ const updateProfile = asyncHandler(async (req, res) => {
 
 const updateProfessionProfile = asyncHandler(async (req, res) => {
   const doctorId = req.user._id;
+
+  if (req.role !== "doctor") {
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden! Only doctors can update their profession profile"
+    );
+  }
 
   if (!doctorId) {
     res.status(400);
@@ -413,6 +438,50 @@ const updateProfessionProfile = asyncHandler(async (req, res) => {
     );
 });
 
+const updatePassword = asyncHandler(async (req, res) => {
+  const doctorId = req.user._id;
+
+  if (req.role !== "doctor") {
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden! Only doctors can update their password"
+    );
+  }
+
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    res.status(400);
+    throw new ApiError(400, "Old password and new password are required");
+  }
+
+  if (oldPassword === newPassword) {
+    res.status(400);
+    throw new ApiError(400, "New password must be different from old password");
+  }
+
+  const doctor = await Doctor.findById(doctorId);
+
+  if (!doctor) {
+    res.status(404);
+    throw new ApiError(404, "Doctor not found");
+  }
+
+  const isOldPasswordCorrect = await doctor.comparePassword(oldPassword);
+  if (!isOldPasswordCorrect) {
+    res.status(401);
+    throw new ApiError(401, "Old password is incorrect");
+  }
+
+  doctor.password = newPassword;
+  await doctor.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Password updated successfully", null));
+});
+
 const deleteProfile = asyncHandler(async (req, res) => {
   const doctorId = req.user._id;
 
@@ -448,5 +517,6 @@ export {
   updateProfilePic,
   updateProfile,
   updateProfessionProfile,
+  updatePassword,
   deleteProfile,
 };

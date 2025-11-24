@@ -3,10 +3,12 @@ import ApiError from "../utils/apiError.js";
 import jwt from "jsonwebtoken";
 import Patient from "../models/patient.model.js";
 import Doctor from "../models/doctor.model.js";
+import Admin from "../models/admin.model.js";
 
 const roleModelMap = {
   patient: Patient,
   doctor: Doctor,
+  admin: Admin,
 };
 
 const verifyJWT = asyncHandler(async (req, res, next) => {

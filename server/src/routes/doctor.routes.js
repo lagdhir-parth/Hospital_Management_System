@@ -11,6 +11,7 @@ import {
   updateProfilePic,
   updateProfile,
   updateProfessionProfile,
+  updatePassword,
   deleteProfile,
 } from "../controllers/doctor.controllers.js";
 
@@ -29,16 +30,14 @@ router
   .route("/updateProfilePic")
   .patch(verifyJWT, upload.single("profilePic"), updateProfilePic);
 
-router
-  .route("/updateProfile")
-  .patch(verifyJWT, upload.none(), updateProfile);
+router.route("/updateProfile").patch(verifyJWT, upload.none(), updateProfile);
 
 router
   .route("/updateProfessionProfile")
   .patch(verifyJWT, upload.none(), updateProfessionProfile);
 
-router
-  .route("/deleteProfile")
-  .delete(verifyJWT, deleteProfile);
+router.route("/updatePassword").patch(verifyJWT, upload.none(), updatePassword);
+
+router.route("/deleteProfile").delete(verifyJWT, deleteProfile);
 
 export default router;

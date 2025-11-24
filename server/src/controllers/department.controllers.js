@@ -5,13 +5,13 @@ import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 
 const createDepartment = asyncHandler(async (req, res) => {
-  // if (req.role !== "admin") {
-  //   res.status(403);
-  //   throw new ApiError(
-  //     403,
-  //     "Forbidden: You don't have permission to perform create action"
-  //   );
-  // }
+  if (req.role !== "admin") {
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden: You don't have permission to perform create action"
+    );
+  }
 
   const {
     name,
@@ -89,13 +89,13 @@ const getDepartmentById = asyncHandler(async (req, res) => {
 });
 
 const updateDepartmentById = asyncHandler(async (req, res) => {
-  // if (req.role !== "admin") {
-  //   res.status(403);
-  //   throw new ApiError(
-  //     403,
-  //     "Forbidden: You don't have permission to perform deletion action"
-  //   );
-  // }
+  if (req.role !== "admin") {
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden: You don't have permission to perform deletion action"
+    );
+  }
 
   const { id } = req.params;
   const {
@@ -146,13 +146,13 @@ const updateDepartmentById = asyncHandler(async (req, res) => {
 });
 
 const deleteDepartmentById = asyncHandler(async (req, res) => {
-  // if (req.role !== "admin") {
-  //   res.status(403);
-  //   throw new ApiError(
-  //     403,
-  //     "Forbidden: You don't have permission to perform deletion action"
-  //   );
-  // }
+  if (req.role !== "admin") {
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden: You don't have permission to perform deletion action"
+    );
+  }
 
   const { id } = req.params;
 

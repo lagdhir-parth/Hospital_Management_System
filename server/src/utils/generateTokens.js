@@ -1,11 +1,13 @@
 import ApiError from "./apiError.js";
 import Patient from "../models/patient.model.js";
 import Doctor from "../models/doctor.model.js";
+import Admin from "../models/admin.model.js";
 
 const generateAccessTokenAndRefreshToken = async (userID, role) => {
   const modelMap = {
     patient: Patient,
     doctor: Doctor,
+    admin: Admin,
   };
 
   const Model = modelMap[role];

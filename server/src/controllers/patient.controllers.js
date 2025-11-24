@@ -7,6 +7,7 @@ import uploadOnCloudinary, {
   deleteFromCloudinary,
 } from "../utils/cloudinary.js";
 import generateAccessTokenAndRefreshToken from "../utils/generateTokens.js";
+import fs from "fs";
 
 const cookieOptions = {
   httpOnly: true,
@@ -58,6 +59,7 @@ const registerPatient = asyncHandler(async (req, res) => {
       allergies,
     ].some((field) => field?.trim() === "")
   ) {
+    fs.unlinkSync(req.file.path);
     res.status(400);
     throw new ApiError(400, "Please fill all the required fields");
   }
@@ -65,6 +67,7 @@ const registerPatient = asyncHandler(async (req, res) => {
   // check if patient already exists
   const patientExists = await Patient.findOne({ username });
   if (patientExists) {
+    fs.unlinkSync(req.file.path);
     res.status(400);
     throw new ApiError(400, "Patient with this username already exists");
   }
@@ -230,6 +233,15 @@ const getAllPatients = asyncHandler(async (req, res) => {
 const updateProfilePic = asyncHandler(async (req, res) => {
   const patientId = req.user._id;
 
+  if (req.role !== "patient") {
+    fs.unlinkSync(req.file.path);
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden! Only patients can update their profile picture"
+    );
+  }
+
   if (!patientId) {
     res.status(400);
     throw new ApiError(400, "Patient id is required to change profile picture");
@@ -292,10 +304,19 @@ const updateProfilePic = asyncHandler(async (req, res) => {
 
 const updateProfile = asyncHandler(async (req, res) => {
   const patientId = req.user._id;
+
+  if (req.role !== "patient") {
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden! Only patients can update their profile"
+    );
+  }
+
   const updateData = req.body;
   const allowedUpdates = ["name", "mobile_no", "email", "address"];
 
-  if (Object.keys(updateData).length === 0) {
+  if (!updateData || Object.keys(updateData).length === 0) {
     res.status(400);
     throw new ApiError(400, "Please provide data to update");
   }
@@ -303,7 +324,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   // Validate update fields
   const updates = Object.keys(updateData);
   const isValidOperation = updates.every((update) =>
-    allowedUpdates.includes(update)
+    allowedUpdates.includes(update) && updateData[update] !== ""
   );
 
   if (!isValidOperation) {
@@ -324,6 +345,15 @@ const updateProfile = asyncHandler(async (req, res) => {
 
 const updateDiagnosesAndAllergies = asyncHandler(async (req, res) => {
   const patientId = req.user._id;
+
+  if (req.role !== "patient") {
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden! Only patients can update their diagnoses and allergies"
+    );
+  }
+
   const { diagnoses, allergies } = req.body || {};
 
   if (!diagnoses && !allergies) {
@@ -349,6 +379,49 @@ const updateDiagnosesAndAllergies = asyncHandler(async (req, res) => {
         updatedPatient
       )
     );
+});
+
+const updatePassword = asyncHandler(async (req, res) => {
+  const patientId = req.user._id;
+
+  if (req.role !== "patient") {
+    res.status(403);
+    throw new ApiError(
+      403,
+      "Forbidden! Only patients can update their password"
+    );
+  }
+
+  const { oldPassword, newPassword } = req.body || {};
+
+  if (!oldPassword || !newPassword) {
+    res.status(400);
+    throw new ApiError(400, "Please provide old and new passwords");
+  }
+
+  const patient = await Patient.findById(patientId);
+  if (!patient) {
+    res.status(404);
+    throw new ApiError(404, "Patient not found");
+  }
+
+  if (oldPassword === newPassword) {
+    res.status(400);
+    throw new ApiError(400, "New password must be different from old password");
+  }
+
+  const isOldPasswordCorrect = await patient.comparePassword(oldPassword);
+  if (!isOldPasswordCorrect) {
+    res.status(401);
+    throw new ApiError(401, "Old password is incorrect");
+  }
+
+  patient.password = newPassword;
+  await patient.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Password updated successfully", null));
 });
 
 const deleteProfile = asyncHandler(async (req, res) => {
@@ -386,5 +459,6 @@ export {
   updateProfilePic,
   updateProfile,
   updateDiagnosesAndAllergies,
+  updatePassword,
   deleteProfile,
 };

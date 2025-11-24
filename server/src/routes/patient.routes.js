@@ -5,10 +5,11 @@ import {
   currentPatient,
   getPatientById,
   getAllPatients,
-  deleteProfile,
   updateProfilePic,
   updateProfile,
   updateDiagnosesAndAllergies,
+  updatePassword,
+  deleteProfile,
 } from "../controllers/patient.controllers.js";
 import { Router } from "express";
 import upload from "../middlewares/multer.middleware.js";
@@ -34,15 +35,13 @@ router
   .route("/updateProfilePic")
   .patch(verifyJWT, upload.single("profilePic"), updateProfilePic);
 
-router
-  .route("/updateProfile")
-  .patch(verifyJWT, upload.none(), updateProfile);
+router.route("/updateProfile").patch(verifyJWT, upload.none(), updateProfile);
 
 router
   .route("/updateDiagnosesAndAllergies")
   .patch(verifyJWT, upload.none(), updateDiagnosesAndAllergies);
-router
-  .route("/deleteProfile")
-  .delete(verifyJWT, deleteProfile);
+
+router.route("/updatePassword").patch(verifyJWT, upload.none(), updatePassword);
+router.route("/deleteProfile").delete(verifyJWT, deleteProfile);
 
 export default router;
