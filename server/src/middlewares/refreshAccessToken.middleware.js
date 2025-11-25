@@ -4,6 +4,7 @@ import ApiResponse from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
 import Patient from "../models/patient.model.js";
 import Doctor from "../models/doctor.model.js";
+import Admin from "../models/admin.model.js";
 import generateAccessTokenAndRefreshToken from "../utils/generateTokens.js";
 
 const cookieOptions = {
@@ -17,10 +18,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
   const modelMap = {
     patient: Patient,
-    doctor: Doctor
+    doctor: Doctor,
+    admin: Admin,
   };
 
-    const Model = modelMap[role];
+  const Model = modelMap[role];
 
   if (!incomingRefreshToken) {
     res.status(401);
