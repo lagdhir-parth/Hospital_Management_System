@@ -4,12 +4,11 @@ import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 import Patient from "../models/patient.model.js";
 import Doctor from "../models/doctor.model.js";
-import Admin from "../models/admin.model.js";
 import Department from "../models/department.model.js";
 
 const requestAppointment = asyncHandler(async (req, res) => {
   const patientId = req.user._id;
-  const { doctorId, departmentId, date, time, reason, notes } = req.body;
+  const { doctorId, departmentId, date, time, diseases, reason } = req.body;
   const status = "Requested";
 
   if (!doctorId || !departmentId || !patientId) {
@@ -35,8 +34,8 @@ const requestAppointment = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Department not found");
   }
 
-  if (!reason || reason.trim() === "") {
-    throw new ApiError(400, "Reason are required to request an appointment");
+  if (!diseases || diseases.trim() === "" || !reason || reason.trim() === "" || !date || !time) {
+    throw new ApiError(400, "All fields are required");
   }
 
   const combinnedDateTime = new Date(`${date}T${time}Z`); // If i append Z, it treats the time as UTC(Original value as frontend), otherwise it considers it as local time zone(my time zone is GMT+5:30)
@@ -54,8 +53,8 @@ const requestAppointment = asyncHandler(async (req, res) => {
     patientId: patientId,
     doctorId: doctorId,
     departmentId: departmentId,
+    diseases,
     reason,
-    notes,
     dateTime,
     status,
   });

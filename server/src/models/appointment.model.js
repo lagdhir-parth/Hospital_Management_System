@@ -21,7 +21,7 @@ const appointmentSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    reason: {
+    diseases: {
       type: String,
       required: true,
     },
@@ -30,9 +30,9 @@ const appointmentSchema = new mongoose.Schema(
       enum: ["Requested", "Scheduled", "Completed", "Cancelled", "No-Show"],
       required: true,
     },
-    notes: {
+    reason: {
       type: String,
-      required: false,
+      required: true,
     },
   },
   { timestamps: true }

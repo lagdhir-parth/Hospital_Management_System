@@ -21,6 +21,8 @@ import doctorRouter from "./routes/doctor.routes.js";
 import departmentRouter from "./routes/department.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 import appointmentRouter from "./routes/appointment.routes.js";
+import prescriptionRouter from "./routes/prescription.routes.js";
+import medicalRecordRouter from "./routes/medicalRecords.routes.js";
 import refreshAccessToken from "./middlewares/refreshAccessToken.middleware.js";
 
 // Mounting routes
@@ -29,6 +31,8 @@ app.use("/api/doctors", doctorRouter);
 app.use("/api/departments", departmentRouter);
 app.use("/api/admins", adminRouter);
 app.use("/api/appointments", appointmentRouter);
+app.use("/api/prescriptions", prescriptionRouter);
+app.use("/api/medicalRecords", medicalRecordRouter);
 
 app.get("/api/:role/refresh-token", refreshAccessToken);
 
