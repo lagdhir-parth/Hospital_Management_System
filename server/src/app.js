@@ -23,6 +23,7 @@ import adminRouter from "./routes/admin.routes.js";
 import appointmentRouter from "./routes/appointment.routes.js";
 import prescriptionRouter from "./routes/prescription.routes.js";
 import medicalRecordRouter from "./routes/medicalRecords.routes.js";
+import billRouter from "./routes/bill.routes.js";
 import refreshAccessToken from "./middlewares/refreshAccessToken.middleware.js";
 
 // Mounting routes
@@ -33,6 +34,7 @@ app.use("/api/admins", adminRouter);
 app.use("/api/appointments", appointmentRouter);
 app.use("/api/prescriptions", prescriptionRouter);
 app.use("/api/medicalRecords", medicalRecordRouter);
+app.use("/api/bills", billRouter);
 
 app.get("/api/:role/refresh-token", refreshAccessToken);
 

@@ -22,6 +22,11 @@ const medicalRecordSchema = new mongoose.Schema(
       ref: "Prescription",
       required: false,
     },
+    billId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Bill",
+      required: false,
+    },
     // diseases are populated from Appointment
   },
   { timestamps: true }
