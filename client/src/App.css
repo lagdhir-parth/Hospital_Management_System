@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #0f766e; /*Use for: primary buttons, active menu item, links, key icons.*/
-  --color-primary-light: #5eead4; /*Use for: hovers, subtle highlights, charts.*/
-  --color-primary-dark: #115e59; /*Use for: headers, navbar background on desktop.*/
+  --color-primary: #019a67; /*Use for: primary buttons, active menu item, links, key icons.*/
+  --color-primary-light: #d0fae5; /*Use for: hovers, subtle highlights, charts.*/
+  --color-primary-dark: #017a4f; /*Use for: headers, navbar background on desktop.*/
 
   --color-bg: #f9fafb;
   --color-surface: #ffffff; /*Use for: cards, panels, forms.*/
   --color-border: #e5e7eb;
 
   --color-text: #111827;
+  --color-light-text: #4a5565;
   --color-text-muted: #6b7280;
 
   --color-success: #16a34a;
