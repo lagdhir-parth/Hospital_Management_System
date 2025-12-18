@@ -1,4 +1,4 @@
-import BgPrimaryBtn from "../bgPrimaryBtn";
+import BgPrimaryBtn from "../BgPrimaryBtn";
 import DepartmentCard from "../DepartmentCard";
 import HeadingAndDesc from "../HeadingAndDesc";
 

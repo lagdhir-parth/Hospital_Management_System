@@ -19,7 +19,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed w-full bg-(--color-primary-dark) flex justify-between items-center p-4 py-5 text-white md:px-20 z-49 ">
+      <nav className="fixed h-[10vh] w-full bg-(--color-primary-dark) flex justify-between items-center p-4 py-5 text-white md:px-20 z-49 ">
         <NavLink to="/">
           <div className="flex font-bold text-xl md:text-2xl">
             <div className="mr-2">

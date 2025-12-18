@@ -4,7 +4,7 @@ import BgPrimaryLightBtn from "../BgPrimaryLightBtn";
 
 const HeroSection = () => {
   return (
-    <div className="bg-[#edfbf9] h-screen  flex flex-col md:justify-center md:items-center md:flex-wrap md:flex-row py-25 md:py-0 md:px-[8vw] gap-10 md:gap-0">
+    <div className="bg-[#edfbf9] h-screen  flex flex-col md:justify-center md:items-center md:flex-wrap md:flex-row py-30 md:py-0 md:px-[8vw] gap-10 md:gap-0">
       <div className="md:size-5/10">
         <div className="px-4 md:px-6">
           <p className=" font-bold text-4xl md:text-[clamp(2.8rem,4vw,6rem)] mb-9 leading-12 md:leading-tight">
