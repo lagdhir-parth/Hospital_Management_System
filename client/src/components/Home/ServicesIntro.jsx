@@ -1,5 +1,6 @@
+import { useNavigate } from "react-router-dom";
+import ContentCard from "../ContentCard";
 import HeadingAndDesc from "../HeadingAndDesc";
-import HeroServiceIntroCard from "./HeroServiceIntroCard";
 import { Brain, Stethoscope, Heart, Shield } from "lucide-react";
 
 const ServicesIntro = () => {
@@ -30,6 +31,8 @@ const ServicesIntro = () => {
     },
   ];
 
+  const navigate = useNavigate();
+
   return (
     <div className="bg-(--color-surface) flex flex-col justify-center items-center gap-10 pb-15 pt-20 md:px-20 ">
       <HeadingAndDesc
@@ -38,11 +41,12 @@ const ServicesIntro = () => {
       />
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 w-90/100 ">
         {services.map((service, index) => (
-          <HeroServiceIntroCard
+          <ContentCard
             key={index}
             icon={service.icon}
             title={service.title}
             description={service.description}
+            onClick={() => navigate("/services")}
           />
         ))}
       </div>

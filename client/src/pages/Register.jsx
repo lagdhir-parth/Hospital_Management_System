@@ -1,11 +1,11 @@
-import React from 'react'
+import PatientRegisterForm from "../components/Auth/PatientRegisterForm";
 
 const Register = () => {
   return (
-    <div>
-      Register Page
-    </div>
-  )
-}
+    <section>
+      <PatientRegisterForm />
+    </section>
+  );
+};
 
-export default Register
+export default Register;

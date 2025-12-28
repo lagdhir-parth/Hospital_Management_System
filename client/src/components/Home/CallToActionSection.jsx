@@ -1,6 +1,7 @@
 import HeadingAndDesc from "../HeadingAndDesc";
 import BgPrimaryLightBtn from "../BgPrimaryLightBtn";
 import { Calendar, Phone } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CallToActionSection = () => {
   return (
@@ -14,13 +15,15 @@ const CallToActionSection = () => {
       </div>
 
       <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-15 px-4 md:px-0">
-        <BgPrimaryLightBtn
-          text={
-            <>
-              <Calendar className="mr-3" /> Book an Appointment
-            </>
-          }
-        />
+        <Link to="/bookAppointment">
+          <BgPrimaryLightBtn
+            text={
+              <>
+                <Calendar className="mr-3" /> Book an Appointment
+              </>
+            }
+          />
+        </Link>
         <BgPrimaryLightBtn
           text={
             <>

@@ -1,11 +1,11 @@
-import React from 'react'
+import PatientLoginForm from "../components/Auth/PatientLoginForm";
 
 const Login = () => {
   return (
     <div>
-      Login Page
+      <PatientLoginForm />
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

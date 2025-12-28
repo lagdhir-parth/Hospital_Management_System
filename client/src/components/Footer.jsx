@@ -10,6 +10,7 @@ import {
   Clock,
   Hospital,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const quickLinks = [
@@ -17,7 +18,7 @@ const Footer = () => {
     { name: "Our Doctors", path: "/doctors" },
     { name: "Services", path: "/services" },
     { name: "Departments", path: "/departments" },
-    { name: "Appointments", path: "/appointments" },
+    { name: "Appointments", path: "/bookAppointment" },
     { name: "Contact", path: "/contact" },
   ];
 
@@ -80,9 +81,9 @@ const Footer = () => {
             <ul className="text-[#d1d5dc] space-y-3">
               {services.map((service, index) => (
                 <li key={index}>
-                  <a href="#" className={anchorClasses}>
+                  <Link to="/services" className={anchorClasses}>
                     {service}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -91,7 +92,7 @@ const Footer = () => {
             <h2 className="font-bold text-lg mb-4">Contact Us</h2>
             <address className="text-[#d1d5dc] space-y-4">
               <ContactInfoElem
-                icon={<MapPin className="text-(--color-primary)" />}
+                icon={<MapPin size={30} className="text-(--color-primary)" />}
                 text="123 Healthcare Drive
 Medical District, NY 10001"
               />

@@ -1,10 +1,11 @@
 import React from "react";
-import BgPrimaryBtn from "../bgPrimaryBtn";
+import BgPrimaryBtn from "../BgPrimaryBtn";
 import BgPrimaryLightBtn from "../BgPrimaryLightBtn";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
-    <div className="bg-[#edfbf9] h-screen  flex flex-col md:justify-center md:items-center md:flex-wrap md:flex-row py-30 md:py-0 md:px-[8vw] gap-10 md:gap-0">
+    <div className="bg-[#edfbf9] h-screen flex flex-col md:justify-center md:items-center md:flex-wrap md:flex-row py-30 md:py-0 md:px-[8vw] gap-10 md:gap-0">
       <div className="md:size-5/10">
         <div className="px-4 md:px-6">
           <p className=" font-bold text-4xl md:text-[clamp(2.8rem,4vw,6rem)] mb-9 leading-12 md:leading-tight">
@@ -19,9 +20,13 @@ const HeroSection = () => {
             with the finest care team every step of the way.
           </p>
 
-          <div className="flex flex-wrap gap-7">
-            <BgPrimaryBtn text="Book an appointment" />
-            <BgPrimaryLightBtn text="Our services" />
+          <div className="flex flex-col md:flex-row flex-wrap gap-7 w-full">
+            <Link to="/bookAppointment">
+              <BgPrimaryBtn text="Book an appointment" />
+            </Link>
+            <Link to="/services">
+              <BgPrimaryLightBtn text="Our services" />
+            </Link>
           </div>
         </div>
       </div>

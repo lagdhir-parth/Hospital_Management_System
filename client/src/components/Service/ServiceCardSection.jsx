@@ -9,6 +9,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import BgPrimaryBtn from "../BgPrimaryBtn";
+import { Link } from "react-router-dom";
 
 const ServiceCardSection = () => {
   const services = [
@@ -142,13 +143,15 @@ const ServiceCard = (props) => {
           ))}
         </div>
         <div className="self-start mb-1">
-          <BgPrimaryBtn
-            text={
-              <>
-                <p>Learn more</p> <ArrowRight />
-              </>
-            }
-          />
+          <Link to="/services">
+            <BgPrimaryBtn
+              text={
+                <>
+                  <p>Learn more</p> <ArrowRight />
+                </>
+              }
+            />
+          </Link>
         </div>
       </div>
     </div>

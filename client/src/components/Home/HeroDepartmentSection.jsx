@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import BgPrimaryBtn from "../BgPrimaryBtn";
 import DepartmentCard from "../DepartmentCard";
 import HeadingAndDesc from "../HeadingAndDesc";
@@ -71,7 +72,9 @@ const HeroDepartmentSection = () => {
         ))}
       </div>
       <div className="flex justify-center items-center p-4 my-4">
-        <BgPrimaryBtn text="View All Departments" />
+        <Link to="/departments">
+          <BgPrimaryBtn text="View All Departments" />
+        </Link>
       </div>
     </div>
   );

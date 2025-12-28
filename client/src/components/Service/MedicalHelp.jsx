@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import BgPrimaryLightBtn from "../BgPrimaryLightBtn";
 
 const MedicalHelp = () => {
@@ -9,7 +10,9 @@ const MedicalHelp = () => {
         possible care.
       </p>
       <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8">
-        <BgPrimaryLightBtn text="Book Appointment" />
+        <Link to="/bookAppointment" className="w-full md:w-auto">
+          <BgPrimaryLightBtn text="Book Appointment" />
+        </Link>
         <BgPrimaryLightBtn text="Emergency Services" />
       </div>
     </div>

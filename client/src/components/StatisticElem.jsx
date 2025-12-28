@@ -1,6 +1,4 @@
-import React from "react";
-
-const StateElem = (props) => {
+const StatisticElem = (props) => {
   return (
     <div className="flex flex-col justify-center items-center">
       <p
@@ -8,9 +6,9 @@ const StateElem = (props) => {
       >
         {props.value}
       </p>
-      <p className="text-(--color-light-text)">{props.description}</p>
+      <p className={`text-${props.mutedTextColor ? props.mutedTextColor : "(--color-light-text)"}`}>{props.description}</p>
     </div>
   );
 };
 
-export default StateElem;
+export default StatisticElem;

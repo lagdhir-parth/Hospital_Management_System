@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import SidePanel from "./SidePanel";
 import { Hospital, Phone, Menu } from "lucide-react";
 
@@ -50,10 +50,12 @@ const Navbar = () => {
 
         <div className="hidden lg:block">
           <div className="flex gap-3 items-center">
-            <button className="hidden xl:flex justify-center items-center gap-2 border border-(--color-border) px-4 py-2 rounded-full text-white font-semibold hover:bg-(--color-primary-light) transition-all duration-200 hover:text-(--color-text) hover:border-transparent">
-              <Phone />
-              <p>Book your Appointment</p>
-            </button>
+            <Link to="/bookAppointment">
+              <button className="hidden xl:flex justify-center items-center gap-2 border border-(--color-border) px-4 py-2 rounded-full text-white font-semibold hover:bg-(--color-primary-light) transition-all duration-200 hover:text-(--color-text) hover:border-transparent">
+                <Phone />
+                <p>Book your Appointment</p>
+              </button>
+            </Link>
 
             <NavLink to="/login">
               <button className="cursor-pointer bg-(--color-primary) px-4 py-2 rounded-full text-white font-semibold hover:bg-(--color-primary-light) transition-all duration-200 hover:text-(--color-text)">
