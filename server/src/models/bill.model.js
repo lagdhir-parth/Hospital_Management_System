@@ -28,16 +28,11 @@ const billSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: [
-        "Credit Card",
-        "Debit Card",
-        "Insurance",
-        "Online Payment",
-      ],
+      enum: ["Credit Card", "Debit Card", "Insurance", "Online Payment"],
       required: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Bill = mongoose.model("Bill", billSchema);

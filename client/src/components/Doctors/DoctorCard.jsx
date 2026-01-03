@@ -67,7 +67,7 @@ const DoctorCard = () => {
           </div>
         </div>
         <div className="flex justify-between gap-3 text-sm h-min">
-            <BgPrimaryBtn text="Book Appointment" className="md:w-full" />
+          <BgPrimaryBtn text="Book Appointment" className="md:w-full" />
 
           <div>
             <BgPrimaryLightBtn text={<Phone size={20} />} />

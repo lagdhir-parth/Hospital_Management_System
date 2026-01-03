@@ -5,7 +5,7 @@ import fs from "fs";
 
 const uploadOnCloudinary = async (
   localFilePath,
-  folderPath = "hospital_management_system"
+  folderPath = "hospital_management_system",
 ) => {
   try {
     cloudinary.config({
@@ -16,7 +16,7 @@ const uploadOnCloudinary = async (
 
     if (!localFilePath) {
       console.error(
-        "local file path must be provided while uploading to Cloudinary"
+        "local file path must be provided while uploading to Cloudinary",
       );
       return null;
     }

@@ -6,7 +6,11 @@ const StatisticElem = (props) => {
       >
         {props.value}
       </p>
-      <p className={`text-${props.mutedTextColor ? props.mutedTextColor : "(--color-light-text)"}`}>{props.description}</p>
+      <p
+        className={`text-${props.mutedTextColor ? props.mutedTextColor : "(--color-light-text)"}`}
+      >
+        {props.description}
+      </p>
     </div>
   );
 };

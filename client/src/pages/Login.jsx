@@ -1,9 +1,9 @@
-import PatientLoginForm from "../components/Auth/PatientLoginForm";
+import UserLoginForm from "../components/Auth/UserLoginForm";
 
 const Login = () => {
   return (
     <div>
-      <PatientLoginForm />
+      <UserLoginForm />
     </div>
   );
 };

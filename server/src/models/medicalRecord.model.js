@@ -29,7 +29,7 @@ const medicalRecordSchema = new mongoose.Schema(
     },
     // diseases are populated from Appointment
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const MedicalRecord = mongoose.model("MedicalRecord", medicalRecordSchema);

@@ -14,15 +14,6 @@ const cookieOptions = {
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies?.refreshToken;
-  const role = req.params?.role || "patient";
-
-  const modelMap = {
-    patient: Patient,
-    doctor: Doctor,
-    admin: Admin,
-  };
-
-  const Model = modelMap[role];
 
   if (!incomingRefreshToken) {
     res.status(401);
@@ -31,8 +22,18 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
   const decodedtoken = jwt.verify(
     incomingRefreshToken,
-    process.env.REFRESH_TOKEN_SECRET
+    process.env.REFRESH_TOKEN_SECRET,
   );
+
+  const role = decodedtoken?.role;
+
+  const modelMap = {
+    patient: Patient,
+    doctor: Doctor,
+    admin: Admin,
+  };
+
+  const Model = modelMap[role];
 
   const user = await Model.findById(decodedtoken?._id);
 
@@ -52,7 +53,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       new ApiResponse(200, "Access token refreshed successfully", {
         accessToken,
         refreshToken,
-      })
+      }),
     );
 });
 

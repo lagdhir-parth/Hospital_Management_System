@@ -11,7 +11,9 @@ import fs from "fs";
 
 const cookieOptions = {
   httpOnly: true,
-  secure: true,
+  secure: true, // REQUIRED for mobile
+  sameSite: "None", // REQUIRED for mobile
+  maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
 };
 
 const registerPatient = asyncHandler(async (req, res) => {
@@ -27,7 +29,7 @@ const registerPatient = asyncHandler(async (req, res) => {
     diagnoses,
     allergies,
     address,
-  } = req.body;
+  } = req.body ?? {};
 
   //   if (
   //     !name ||
@@ -44,48 +46,59 @@ const registerPatient = asyncHandler(async (req, res) => {
   //     throw new ApiError(400, "Please fill all the required fields");
   //   }
 
-  if (
-    [
-      name,
-      username,
-      mobile_no,
-      email,
-      password,
-      age,
-      bloodGroup,
-      gender,
-      address,
-      diagnoses,
-      allergies,
-    ].some((field) => field?.trim() === "")
-  ) {
-    fs.unlinkSync(req.file.path);
+  const requiredFields = [
+    name,
+    username,
+    mobile_no,
+    email,
+    password,
+    bloodGroup,
+    gender,
+    diagnoses,
+    address,
+  ];
+
+  if (requiredFields.some((field) => !field || field.trim() === "")) {
+    if (req.file?.path) fs.unlinkSync(req.file.path);
     res.status(400);
-    throw new ApiError(400, "Please fill all the required fields");
+    throw new ApiError(400, "Please fill all required fields");
   }
 
   // check if patient already exists
-  const patientExists = await Patient.findOne({ username });
+  const patientExists = await Patient.findOne({
+    $or: [
+      { username: { $regex: new RegExp(`^${username.trim()}$`, "i") } },
+      { email: { $regex: new RegExp(`^${email.trim()}$`, "i") } },
+    ],
+  });
+
   if (patientExists) {
-    fs.unlinkSync(req.file.path);
-    res.status(400);
-    throw new ApiError(400, "Patient with this username already exists");
+    if (req.file?.path) fs.unlinkSync(req.file.path);
+    throw new ApiError(
+      400,
+      `Patient with this ${
+        patientExists.username === username.trim() ? "username" : "email"
+      } already exists`,
+    );
   }
 
   // check for profile pic
-  if (!req.file) {
-    res.status(400);
-    throw new ApiError(400, "Profile picture is required");
-  }
-  // upload profile pic to cloudinary
-  const profilePic = await uploadOnCloudinary(
-    req.file?.path,
-    "hospital_management_system/patients"
-  );
+  let profilePic = null;
+  let profilePicPublicId = null;
 
-  if (!profilePic) {
-    res.status(500);
-    throw new ApiError(500, "Error uploading profile picture to cloudinary");
+  if (req.file) {
+    // upload profile pic to cloudinary
+    const cloudinaryResult = await uploadOnCloudinary(
+      req.file?.path,
+      "hospital_management_system/patients",
+    );
+
+    if (!cloudinaryResult) {
+      res.status(500);
+      throw new ApiError(500, "Error uploading profile picture to cloudinary");
+    }
+    profilePic = cloudinaryResult.url;
+    profilePicPublicId = cloudinaryResult.public_id;
   }
 
   // create new patient
@@ -100,13 +113,13 @@ const registerPatient = asyncHandler(async (req, res) => {
     gender,
     diagnoses: diagnoses ? diagnoses.split(",").map((d) => d.trim()) : [],
     allergies: allergies ? allergies.split(",").map((a) => a.trim()) : [],
-    profilePic: profilePic.url,
-    profilePicPublicId: profilePic.public_id,
+    profilePic,
+    profilePicPublicId,
     address,
   });
 
   const createdPatient = await Patient.findById(patient._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken",
   );
 
   if (!createdPatient) {
@@ -116,88 +129,7 @@ const registerPatient = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(
-      new ApiResponse(201, "Patient registered successfully", createdPatient)
-    );
-});
-
-const loginPatient = asyncHandler(async (req, res) => {
-  // retrieve data from frontend (guard against req.body being undefined)
-  const { username, password } = req.body ?? {};
-
-  // validate data
-  if (!username || !password) {
-    res.status(400);
-    throw new ApiError(400, "Please provide username and password");
-  }
-
-  const user = await Patient.findOne({ username });
-  if (!user) {
-    res.status(401);
-    throw new ApiError(401, "Invalid username");
-  }
-
-  const isPasswordCorrect = await user.comparePassword(password);
-  if (!isPasswordCorrect) {
-    res.status(401);
-    throw new ApiError(401, "Invalid password");
-  }
-
-  const { accessToken, refreshToken } =
-    await generateAccessTokenAndRefreshToken(user._id, "patient");
-
-  const loggedInPatient = await Patient.findById(user._id).select(
-    "-password -refreshToken"
-  );
-
-  return res
-    .status(200)
-    .cookie("refreshToken", refreshToken, cookieOptions)
-    .cookie("accessToken", accessToken, cookieOptions)
-    .json(
-      new ApiResponse(200, "Patient logged in successfully", {
-        patient: loggedInPatient,
-        accessToken,
-      })
-    );
-});
-
-const patientLogout = asyncHandler(async (req, res) => {
-  const loggedOutPatient = await Patient.findByIdAndUpdate(
-    req.user._id,
-    {
-      $set: {
-        refreshToken: null,
-      },
-    },
-    { new: true } // to return the updated document
-  );
-  res
-    .status(200)
-    .clearCookie("refreshToken", cookieOptions)
-    .clearCookie("accessToken", cookieOptions)
-    .json(
-      new ApiResponse(
-        200,
-        { loggedOutPatient, role: req.role },
-        "Patient logged out successfully"
-      )
-    );
-});
-
-const currentPatient = asyncHandler(async (req, res) => {
-  const patient = await Patient.findById(req.user._id).select(
-    "-password -refreshToken"
-  );
-
-  if (!patient) {
-    res.status(404);
-    throw new ApiError(404, "Patient not found");
-  }
-
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, "Current patient fetched successfully", patient)
+      new ApiResponse(201, "Patient registered successfully", createdPatient),
     );
 });
 
@@ -238,7 +170,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only patients can update their profile picture"
+      "Forbidden! Only patients can update their profile picture",
     );
   }
 
@@ -264,7 +196,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       if (!delResult) {
         console.warn(
           "Cloudinary deletion returned unexpected result:",
-          delResult
+          delResult,
         );
       }
     } catch (err) {
@@ -274,7 +206,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
 
   const uploadedProfilePic = await uploadOnCloudinary(
     req.file?.path,
-    "hospital_management_system/patients"
+    "hospital_management_system/patients",
   );
 
   if (!uploadedProfilePic) {
@@ -288,7 +220,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       profilePic: uploadedProfilePic.url,
       profilePicPublicId: uploadedProfilePic.public_id,
     },
-    { new: true }
+    { new: true },
   ).select("-password -refreshToken");
 
   return res
@@ -297,8 +229,8 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Profile picture updated successfully",
-        updatedPatient
-      )
+        updatedPatient,
+      ),
     );
 });
 
@@ -309,7 +241,7 @@ const updateProfile = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only patients can update their profile"
+      "Forbidden! Only patients can update their profile",
     );
   }
 
@@ -323,8 +255,8 @@ const updateProfile = asyncHandler(async (req, res) => {
 
   // Validate update fields
   const updates = Object.keys(updateData);
-  const isValidOperation = updates.every((update) =>
-    allowedUpdates.includes(update) && updateData[update] !== ""
+  const isValidOperation = updates.every(
+    (update) => allowedUpdates.includes(update) && updateData[update] !== "",
   );
 
   if (!isValidOperation) {
@@ -335,7 +267,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   const updatedPatient = await Patient.findByIdAndUpdate(
     patientId,
     updateData,
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   ).select("-password -refreshToken");
 
   return res
@@ -350,7 +282,7 @@ const updateDiagnosesAndAllergies = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only patients can update their diagnoses and allergies"
+      "Forbidden! Only patients can update their diagnoses and allergies",
     );
   }
 
@@ -367,7 +299,7 @@ const updateDiagnosesAndAllergies = asyncHandler(async (req, res) => {
       diagnoses: diagnoses ? diagnoses.split(",").map((d) => d.trim()) : [],
       allergies: allergies ? allergies.split(",").map((a) => a.trim()) : [],
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   ).select("-password -refreshToken");
 
   return res
@@ -376,8 +308,8 @@ const updateDiagnosesAndAllergies = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Diagnoses and allergies updated successfully",
-        updatedPatient
-      )
+        updatedPatient,
+      ),
     );
 });
 
@@ -388,7 +320,7 @@ const updatePassword = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only patients can update their password"
+      "Forbidden! Only patients can update their password",
     );
   }
 
@@ -451,9 +383,6 @@ const deleteProfile = asyncHandler(async (req, res) => {
 
 export {
   registerPatient,
-  loginPatient,
-  patientLogout,
-  currentPatient,
   getPatientById,
   getAllPatients,
   updateProfilePic,

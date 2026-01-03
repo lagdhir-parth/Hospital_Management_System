@@ -22,10 +22,7 @@ const createPrescription = asyncHandler(async (req, res) => {
 
   const existingPrescription = await Prescription.findOne({ appointmentId });
   if (existingPrescription) {
-    throw new ApiError(
-      400,
-      "Prescription for this appointment already exists"
-    );
+    throw new ApiError(400, "Prescription for this appointment already exists");
   }
 
   const newPrescription = await Prescription.create({
@@ -41,7 +38,11 @@ const createPrescription = asyncHandler(async (req, res) => {
   res
     .status(201)
     .json(
-      new ApiResponse(201, "Prescription created successfully", newPrescription)
+      new ApiResponse(
+        201,
+        "Prescription created successfully",
+        newPrescription,
+      ),
     );
 });
 
@@ -68,8 +69,8 @@ const getPrescriptionsByAppointment = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Prescriptions retrieved successfully",
-        prescriptions
-      )
+        prescriptions,
+      ),
     );
 });
 
@@ -88,7 +89,7 @@ const updatePrescription = asyncHandler(async (req, res) => {
   const prescription = await Prescription.findByIdAndUpdate(
     prescriptionId,
     { medicalSupplies, instructions, notes },
-    { new: true }
+    { new: true },
   );
 
   if (!prescription) {
@@ -98,7 +99,7 @@ const updatePrescription = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(
-      new ApiResponse(200, "Prescription updated successfully", prescription)
+      new ApiResponse(200, "Prescription updated successfully", prescription),
     );
 });
 

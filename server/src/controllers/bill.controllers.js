@@ -13,7 +13,7 @@ const createBill = asyncHandler(async (req, res) => {
 
   const appointment = await Appointment.findById(appointmentId).populate(
     "doctorId",
-    "name username email consultationFee mobileNumber"
+    "name username email consultationFee mobileNumber",
   );
   if (!appointment) {
     throw new ApiError(404, "Appointment not found");

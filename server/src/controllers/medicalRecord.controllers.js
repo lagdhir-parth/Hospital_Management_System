@@ -22,7 +22,7 @@ const createMedicalRecord = asyncHandler(async (req, res) => {
   if (existingRecord) {
     throw new ApiError(
       400,
-      "Medical record for this appointment already exists"
+      "Medical record for this appointment already exists",
     );
   }
 
@@ -41,7 +41,11 @@ const createMedicalRecord = asyncHandler(async (req, res) => {
   res
     .status(201)
     .json(
-      new ApiResponse(201, "Medical record created successfully", medicalRecord)
+      new ApiResponse(
+        201,
+        "Medical record created successfully",
+        medicalRecord,
+      ),
     );
 });
 
@@ -76,7 +80,7 @@ const addPrescriptionToMedicalRecord = asyncHandler(async (req, res) => {
   if (req.role !== "doctor") {
     throw new ApiError(
       403,
-      "Only doctors can add prescriptions to medical records"
+      "Only doctors can add prescriptions to medical records",
     );
   }
 
@@ -90,7 +94,7 @@ const addPrescriptionToMedicalRecord = asyncHandler(async (req, res) => {
   const medicalRecord = await MedicalRecord.findByIdAndUpdate(
     medicalRecordId,
     { prescriptionId },
-    { new: true }
+    { new: true },
   );
 
   if (!medicalRecord) {
@@ -103,8 +107,8 @@ const addPrescriptionToMedicalRecord = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Prescription added to medical record successfully",
-        medicalRecord
-      )
+        medicalRecord,
+      ),
     );
 });
 
@@ -121,10 +125,8 @@ const deleteMedicalRecord = asyncHandler(async (req, res) => {
   //   );  This used to remove from multiple patients which is connected to specific medicalRecord ID if needed
 
   await Patient.findByIdAndUpdate(
-    (
-      await MedicalRecord.findById(medicalRecordId)
-    ).patientId,
-    { $pull: { medicalHistory: medicalRecordId } }
+    (await MedicalRecord.findById(medicalRecordId)).patientId,
+    { $pull: { medicalHistory: medicalRecordId } },
   );
 
   const medicalRecord = await MedicalRecord.findByIdAndDelete(medicalRecordId);

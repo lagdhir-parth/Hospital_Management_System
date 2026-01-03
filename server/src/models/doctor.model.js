@@ -78,7 +78,7 @@ const doctorSchema = new mongoose.Schema(
       required: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 doctorSchema.pre("save", async function (next) {
@@ -105,7 +105,7 @@ doctorSchema.methods.generateAccessToken = function () {
     process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-    }
+    },
   );
 };
 
@@ -118,7 +118,7 @@ doctorSchema.methods.generateRefreshToken = function () {
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-    }
+    },
   );
 };
 

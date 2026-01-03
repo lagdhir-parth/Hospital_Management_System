@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import BgPrimaryBtn from "../BgPrimaryBtn";
+import { ImagePlus } from "lucide-react";
+import ErrorOrSuccessMsg from "../ErrorOrSuccessMsg";
+import api from "../../api/axios";
+import CustomDropdown from "../CustomDropdown";
 
-const PatientRegisterForm = ({ onSubmit }) => {
+const PatientRegisterForm = () => {
   const [form, setForm] = useState({
     name: "",
     username: "",
@@ -17,22 +21,107 @@ const PatientRegisterForm = ({ onSubmit }) => {
     profilePic: null,
   });
 
+  const [loading, setLoading] = useState(false);
+  const [profilePicImg, setProfilePicImg] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const imageUploadRef = useRef(null);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
+      setProfilePicImg(files[0]);
       setForm((prev) => ({ ...prev, [name]: files[0] }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleDivClick = () => {
+    imageUploadRef.current.click();
+  };
+
+  const isFormDataValid = () => {
+    const requiredFields = [
+      { key: "name", label: "Full Name" },
+      { key: "username", label: "Username" },
+      { key: "mobile_no", label: "Mobile Number" },
+      { key: "email", label: "Email" },
+      { key: "password", label: "Password" },
+      { key: "age", label: "Age" },
+      { key: "bloodGroup", label: "Blood Group" },
+      { key: "gender", label: "Gender" },
+      { key: "diagnoses", label: "Diagnoses", trim: true },
+      { key: "address", label: "Address", trim: true },
+    ];
+    for (const { key, label, trim = false } of requiredFields) {
+      const value = form[key];
+      const checkValue = trim ? value?.trim() : value;
+
+      if (!checkValue) {
+        setErrorMessage(`${label} is required.`);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const registerPatient = async () => {
     const data = new FormData();
     Object.entries(form).forEach(([key, value]) => {
-      if (value !== null && value !== undefined) data.append(key, value);
+      if (value !== null && value !== undefined && value !== "") {
+        data.append(key, value);
+      }
     });
-    onSubmit?.(data);
+
+    try {
+      const res = await api.post(`/patients/register`, data);
+
+      setSuccessMessage(
+        res.data.message || "Patient profile created successfully!",
+      );
+
+      // Reset form
+      setForm({
+        name: "",
+        username: "",
+        mobile_no: "",
+        email: "",
+        password: "",
+        age: "",
+        bloodGroup: "",
+        gender: "",
+        diagnoses: "",
+        allergies: "",
+        address: "",
+        profilePic: null,
+      });
+      setProfilePicImg(null);
+      if (imageUploadRef.current) imageUploadRef.current.value = "";
+    } catch (error) {
+      console.error("Full error response:", error.response.data.message);
+
+      // ✅ Get specific backend error
+      const errorMsg =
+        error.response?.data?.message ||
+        "An error occurred during registration. Please try again.";
+      setErrorMessage(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (isFormDataValid()) {
+      await registerPatient();
+    } else {
+      setLoading(false);
+      return;
+    }
   };
 
   const inputClasses =
@@ -158,52 +247,23 @@ const PatientRegisterForm = ({ onSubmit }) => {
 
           {/* Medical info */}
           <div className="grid gap-4 md:grid-cols-3">
-            <FormField label="Blood Group" name="bloodGroup" required>
-              <select
-                name="bloodGroup"
-                value={form.bloodGroup}
-                onChange={handleChange}
-                className={inputClasses}
-              >
-                <option value="">Select</option>
-                <option>A+</option>
-                <option>A-</option>
-                <option>B+</option>
-                <option>B-</option>
-                <option>O+</option>
-                <option>O-</option>
-                <option>AB+</option>
-                <option>AB-</option>
-              </select>
-            </FormField>
+            <CustomDropdown
+              setForm={setForm}
+              value={form.bloodGroup}
+              placeholder="Select blood group"
+              options={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]}
+              name="bloodGroup"
+              label="Blood Group"
+            />
 
-            <FormField label="Gender" name="gender" required>
-              <select
-                name="gender"
-                value={form.gender}
-                onChange={handleChange}
-                className={inputClasses}
-              >
-                <option value="">Select</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
-              </select>
-            </FormField>
-
-            <FormField label="Profile Picture" name="profilePic" required>
-              <input
-                type="file"
-                name="profilePic"
-                accept="image/*"
-                onChange={handleChange}
-                className="block w-full text-sm text-(--color-text-muted)
-                           file:mr-3 file:rounded-md file:border-0
-                           file:bg-(--color-primary)/10 file:px-3 file:py-1.5
-                           file:text-sm file:font-medium file:text-(--color-primary)
-                           hover:file:bg-(--color-primary)/20 file:transition-all file:duration-200"
-              />
-            </FormField>
+            <CustomDropdown
+              setForm={setForm}
+              value={form.gender}
+              placeholder="Select gender"
+              options={["Male", "Female", "Other"]}
+              name="gender"
+              label="Gender"
+            />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -211,6 +271,7 @@ const PatientRegisterForm = ({ onSubmit }) => {
               label="Diagnoses"
               name="diagnoses"
               helper="Comma separated: Diabetes, Hypertension"
+              required
             >
               <textarea
                 name="diagnoses"
@@ -247,7 +308,71 @@ const PatientRegisterForm = ({ onSubmit }) => {
             />
           </FormField>
 
-          <div className="flex items-center justify-between gap-4 pt-2">
+          <div className="py-4 flex justify-center items-center">
+            <FormField label="Profile Picture" name="profilePic">
+              <div className="flex flex-col items-start">
+                <input
+                  type="file"
+                  name="profilePic"
+                  accept="image/*"
+                  onChange={handleChange}
+                  ref={imageUploadRef}
+                  className="hidden text-sm text-(--color-text-muted)
+                           file:mr-3 file:rounded-md file:border-0
+                           file:bg-(--color-primary)/10 file:px-3 file:py-1.5
+                           file:text-sm file:font-medium file:text-(--color-primary)
+                           hover:file:bg-(--color-primary)/20 file:transition-all file:duration-200"
+                />
+
+                <div>
+                  <div
+                    className={`size-50 p-2 flex justify-center items-center rounded-full bg-(--color-primary)/30 border-2 border-(--color-border) ${
+                      profilePicImg ? "bg-(--color-primary)/50" : ""
+                    } mt-2 cursor-pointer hover:border-(--color-primary) transition-colors duration-200`}
+                    onClick={handleDivClick}
+                  >
+                    {profilePicImg ? (
+                      <img
+                        src={URL.createObjectURL(profilePicImg)}
+                        alt="Profile Preview"
+                        className="size-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 text-(--color-text-muted)">
+                        <ImagePlus />
+                        <span className="">No image selected</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex justify-center items-center">
+                    {profilePicImg && (
+                      <button
+                        className="py-2 px-4 mt-2 bg-(--color-error)/20 text-(--color-error) rounded-md cursor-pointer hover:bg-(--color-error)/30 transition-colors duration-200 text-sm"
+                        onClick={() => {
+                          setProfilePicImg(null); // Clear preview
+                          setForm((prev) => ({ ...prev, profilePic: null })); // Clear form state
+                          if (imageUploadRef.current)
+                            imageUploadRef.current.value = ""; // Reset input
+                        }}
+                        type="button"
+                      >
+                        Remove Image
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </FormField>
+          </div>
+
+          <ErrorOrSuccessMsg
+            successMessage={successMessage}
+            setSuccessMessage={setSuccessMessage}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+          />
+
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-2">
             <p className="text-xs text-(--color-text-muted) md:text-sm">
               By creating an account you agree to our{" "}
               <span className="font-medium text-(--color-primary)">
@@ -261,7 +386,18 @@ const PatientRegisterForm = ({ onSubmit }) => {
             </p>
 
             <div className="min-w-[150px]">
-              <BgPrimaryBtn text="Create patient profile" className="w-full" />
+              {loading ? (
+                <BgPrimaryBtn
+                  text="Creating profile..."
+                  className="w-full"
+                  disabled
+                />
+              ) : (
+                <BgPrimaryBtn
+                  text="Create patient profile"
+                  className="w-full"
+                />
+              )}
             </div>
           </div>
         </form>

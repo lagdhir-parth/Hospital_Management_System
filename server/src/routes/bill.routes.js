@@ -1,7 +1,12 @@
 import { Router } from "express";
 import upload from "../middlewares/multer.middleware.js";
 import verifyJWT from "../middlewares/auth.middleware.js";
-import { createBill, updatePayment, getBillById, deleteBill } from "../controllers/bill.controllers.js";
+import {
+  createBill,
+  updatePayment,
+  getBillById,
+  deleteBill,
+} from "../controllers/bill.controllers.js";
 
 const router = Router();
 

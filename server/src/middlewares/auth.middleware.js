@@ -20,7 +20,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
     res.status(401);
     throw new ApiError(
       401,
-      "Access Denied: Unauthorized access, No Token Provided"
+      "Access Denied: Unauthorized access, No Token Provided",
     );
   }
 
@@ -30,15 +30,13 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
     const { _id, role } = decoded || {};
 
     const Model = roleModelMap[role];
-    
+
     if (!Model) {
       res.status(401);
       throw new ApiError(401, "Access Denied: Invalid Token role");
     }
 
-    const user = await Model.findById(_id).select(
-      "-password -refreshToken"
-    );
+    const user = await Model.findById(_id).select("-password -refreshToken");
 
     if (!user) {
       res.status(401);

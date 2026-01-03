@@ -39,7 +39,7 @@ const createAdmin = asyncHandler(async (req, res) => {
 
   const profilePic = await uploadOnCloudinary(
     req.file?.path,
-    "hospital_management_system/admins"
+    "hospital_management_system/admins",
   );
 
   if (!profilePic) {
@@ -58,100 +58,12 @@ const createAdmin = asyncHandler(async (req, res) => {
   });
 
   const createdAdmin = await Admin.findById(newAdmin._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken",
   );
 
   return res
     .status(201)
     .json(new ApiResponse(201, "Admin created successfully", createdAdmin));
-});
-
-const loginAdmin = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    res.status(400);
-    throw new ApiError(400, "Please provide username and password");
-  }
-
-  const admin = await Admin.findOne({ username });
-
-  if (!admin) {
-    res.status(401);
-    throw new ApiError(401, "Invalid username or password");
-  }
-
-  const isPasswordValid = await admin.comparePassword(password);
-
-  if (!isPasswordValid) {
-    res.status(401);
-    throw new ApiError(401, "Invalid username or password");
-  }
-
-  const { accessToken, refreshToken } =
-    await generateAccessTokenAndRefreshToken(admin._id, "admin");
-
-  const loggedInAdmin = await Admin.findById(admin._id).select(
-    "-password -refreshToken"
-  );
-
-  return res
-    .status(200)
-    .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("refreshToken", refreshToken, cookieOptions)
-    .json(
-      new ApiResponse(200, "Admin logged in successfully", {
-        admin: loggedInAdmin,
-        accessToken,
-      })
-    );
-});
-
-const logoutAdmin = asyncHandler(async (req, res) => {
-  const adminId = req.user._id;
-
-  if (!adminId) {
-    res.status(400);
-    throw new ApiError(400, "Admin ID is required");
-  }
-
-  const loggedOutAdmin = await Admin.findByIdAndUpdate(
-    adminId,
-    { $set: { refreshToken: null } },
-    { new: true }
-  );
-
-  return res
-    .status(200)
-    .clearCookie("accessToken", cookieOptions)
-    .clearCookie("refreshToken", cookieOptions)
-    .json(
-      new ApiResponse(200, "Admin logged out successfully", loggedOutAdmin)
-    );
-});
-
-const getCurrentAdmin = asyncHandler(async (req, res) => {
-  const adminId = req.user._id;
-
-  if (!adminId) {
-    res.status(400);
-    throw new ApiError(400, "Admin ID is required");
-  }
-
-  const currentAdmin = await Admin.findById(adminId).select(
-    "-password -refreshToken"
-  );
-
-  if (!currentAdmin) {
-    res.status(404);
-    throw new ApiError(404, "Admin not found");
-  }
-
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, "Current admin retrieved successfully", currentAdmin)
-    );
 });
 
 const getAdminById = asyncHandler(async (req, res) => {
@@ -191,7 +103,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only admins can update their profile picture"
+      "Forbidden! Only admins can update their profile picture",
     );
   }
 
@@ -219,7 +131,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       if (!delResult) {
         console.warn(
           "Cloudinary deletion returned unexpected result:",
-          delResult
+          delResult,
         );
       }
     } catch (err) {
@@ -229,7 +141,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
 
   const profilePic = await uploadOnCloudinary(
     req.file?.path,
-    "hospital_management_system/admins"
+    "hospital_management_system/admins",
   );
   if (!profilePic) {
     res.status(500);
@@ -267,7 +179,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   }
 
   const isValidOperation = Object.keys(updates).every(
-    (update) => allowedUpdates.includes(update) && updates[update] !== ""
+    (update) => allowedUpdates.includes(update) && updates[update] !== "",
   );
 
   if (!isValidOperation) {
@@ -282,7 +194,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, "Admin profile updated successfully", updatedAdmin)
+      new ApiResponse(200, "Admin profile updated successfully", updatedAdmin),
     );
 });
 
@@ -363,7 +275,6 @@ const deleteAdmin = asyncHandler(async (req, res) => {
 });
 
 const deleteUserById = asyncHandler(async (req, res) => {
-
   if (req.role !== "admin") {
     res.status(403);
     throw new ApiError(403, "Only admins can delete users");
@@ -391,7 +302,7 @@ const deleteUserById = asyncHandler(async (req, res) => {
 
   if (user?.profilePicPublicId) {
     await deleteFromCloudinary(user.profilePicPublicId);
-  } 
+  }
 
   const deletedUser = await Model.findByIdAndDelete(userId);
 
@@ -402,9 +313,6 @@ const deleteUserById = asyncHandler(async (req, res) => {
 
 export {
   createAdmin,
-  loginAdmin,
-  logoutAdmin,
-  getCurrentAdmin,
   getAdminById,
   getAllAdmins,
   updateProfilePic,

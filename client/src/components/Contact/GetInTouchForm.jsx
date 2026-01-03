@@ -2,6 +2,7 @@ import { useState } from "react";
 import BgPrimaryBtn from "../BgPrimaryBtn";
 import { ChevronDown } from "lucide-react";
 import BgPrimaryLightBtn from "../BgPrimaryLightBtn";
+import CustomDropdown from "../CustomDropdown";
 
 const GetInTouchForm = () => {
   const inputClasses =
@@ -53,7 +54,7 @@ const GetInTouchForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Submitted!!!")
+    console.log("Submitted!!!");
   };
 
   const setValue = (value) => {
@@ -137,39 +138,17 @@ const GetInTouchForm = () => {
           />
         </div>
         <div>
-          <label htmlFor="department" className={labelClasses}>
-            Department:
-          </label>
-          <div className="relative w-full">
-            {/* Trigger */}
-            <button
-              type="button"
-              onClick={() => setDropdownOpen((o) => !o)}
-              className={inputClasses + " flex items-center justify-between"}
-            >
-              <span>{dropDownValue ?? "Select department"}</span>
-              <ChevronDown className="h-4 w-4" />
-            </button>
-
-            {/* Custom dropdown */}
-            {DropdownOpen && (
-              <ul className="absolute z-20 mt-1 w-full rounded-lg border border-(--color-border) bg-(--color-surface) shadow-lg p-1">
-                {departments.map((dept) => (
-                  <li
-                    key={dept}
-                    onClick={() => {
-                      setValue(dept);
-                      setDropdownOpen(false);
-                    }}
-                    className="cursor-pointer px-3 py-2 text-sm text-(--color-light-text)
-                     hover:bg-gray-200 rounded-lg" // custom hover
-                  >
-                    {dept}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <CustomDropdown
+            setForm={setFormData}
+            options={departments}
+            value={dropDownValue} //TODO: Make Form of it and after that set value from formData
+            placeholder="Select Department"
+            name="department"
+            label="Department"
+            btnClasses={
+              "w-full bg-gray-100 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-400 transition-colors duration-200 text-sm"
+            }
+          />
         </div>
         <div>
           <label htmlFor="subject" className={labelClasses}>
@@ -202,9 +181,12 @@ const GetInTouchForm = () => {
           ></textarea>
         </div>
         <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-10">
-          <BgPrimaryBtn onClick={handleSubmit} type="submit" text="Send Message" />
+          <BgPrimaryBtn
+            onClick={handleSubmit}
+            type="submit"
+            text="Send Message"
+          />
           <BgPrimaryLightBtn onClick={handleClear} text="Clear" />{" "}
-          {/* TODO: Clear Form using Value */}
         </div>
       </fieldset>
     </form>

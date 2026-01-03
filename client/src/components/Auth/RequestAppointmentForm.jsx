@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BgPrimaryBtn from "../BgPrimaryBtn";
+import api from "../../api/axios";
+import ErrorOrSuccessMsg from "../ErrorOrSuccessMsg";
+import CustomDropdown from "../CustomDropdown";
 
-const RequestAppointmentForm = ({
-  doctors = [],
-  departments = [],
-  onSubmit,
-}) => {
+const RequestAppointmentForm = () => {
   const [form, setForm] = useState({
     doctorId: "",
     departmentId: "",
@@ -15,22 +14,107 @@ const RequestAppointmentForm = ({
     reason: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [doctors, setDoctors] = useState([]);
+  const [departments, setDepartments] = useState([]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const fetchData = async () => {
+    const doctorRes = await api.get(`/doctors/allDoctors`);
+    setDoctors(doctorRes.data.data);
 
-    onSubmit?.({
-      doctorId: form.doctorId,
-      departmentId: form.departmentId,
-      date: form.date,       // yyyy‑mm‑dd for your controller
-      time: form.time,       // HH:mm
-      diseases: form.diseases.trim(),
-      reason: form.reason.trim(),
+    const departmentRes = await api.get(`/departments/allDepartments`);
+    setDepartments(departmentRes.data.data);
+
+    console.log("Doctors fetched", doctorRes.data.data);
+    console.log("Departments fetched", departmentRes.data.data);
+  };
+
+  useEffect(() => {
+    try {
+      fetchData();
+    } catch (error) {
+      console.log("Error occured", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const doctorsName = doctors.map((doc) => doc.name);
+    console.log("Doctors names:", doctorsName);
+  }, [doctors]);
+
+  useEffect(() => {
+    const departmentsName = departments.map((dep) => dep.name);
+    console.log("Departments names:", departmentsName);
+  }, [departments]);
+
+  const isFormDataValid = () => {
+    const requiredFields = [
+      { key: "doctorId", label: "Doctor" },
+      { key: "departmentId", label: "Department" },
+      { key: "date", label: "Date" },
+      { key: "time", label: "Time" },
+      { key: "diseases", label: "Diseases", trim: true },
+      { key: "reason", label: "Reason", trim: true },
+    ];
+    for (const { key, label, trim = false } of requiredFields) {
+      const value = form[key];
+      const checkValue = trim ? value?.trim() : value;
+
+      if (!checkValue) {
+        setErrorMessage(`${label} is required.`);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const data = new FormData();
+    Object.entries(form).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== "") {
+        data.append(key, value);
+      }
     });
+
+    const requestAppointment = async () => {
+      try {
+        const res = await api.post(`/appointments/requestAppointment`, data);
+        console.log(res);
+        setSuccessMessage("Appointment requested successfully!");
+        setForm({
+          doctorId: "",
+          departmentId: "",
+          date: "",
+          time: "",
+          diseases: "",
+          reason: "",
+        });
+      } catch (error) {
+        console.error("Error requesting appointment:", error);
+        setErrorMessage(
+          error.response?.data?.message || "Failed to request appointment.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isFormDataValid()) {
+      await requestAppointment();
+    } else {
+      setLoading(false);
+      return;
+    }
   };
 
   const input =
@@ -45,6 +129,7 @@ const RequestAppointmentForm = ({
     "focus:border-(--color-primary) focus:ring-1 focus:ring-(--color-primary) " +
     "placeholder:text-(--color-text-muted) resize-y";
 
+  console.log(form.doctorId);
   return (
     <section className="flex justify-center bg-(--color-surface-muted) px-4 py-[15vh] md:[20vh]">
       <div className="w-full max-w-4xl overflow-hidden rounded-3xl bg-(--color-surface) shadow-xl ring-1 ring-(--color-border)/60 md:grid md:grid-cols-[3fr,2fr]">
@@ -68,51 +153,32 @@ const RequestAppointmentForm = ({
 
           {/* Doctor & department */}
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium text-(--color-text)">
-                Select doctor <span className="text-(--color-primary)">*</span>
-              </span>
-              <select
-                name="doctorId"
-                value={form.doctorId}
-                onChange={handleChange}
-                className={input}
-              >
-                <option value="">Choose a doctor</option>
-                {doctors.map((doc) => (
-                  <option key={doc._id} value={doc._id}>
-                    {doc.name} &middot; {doc.specialization}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <CustomDropdown
+              name="doctorId"
+              label="Doctor"
+              options={doctors}
+              value={form.doctorId}
+              placeholder="Choose doctor"
+              searchable
+              setForm={setForm}
+            />
 
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium text-(--color-text)">
-                Department <span className="text-(--color-primary)">*</span>
-              </span>
-              <select
-                name="departmentId"
-                value={form.departmentId}
-                onChange={handleChange}
-                className={input}
-              >
-                <option value="">Choose a department</option>
-                {departments.map((dep) => (
-                  <option key={dep._id} value={dep._id}>
-                    {dep.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <CustomDropdown
+              name="departmentId"
+              label="Department"
+              options={departments}
+              value={form.departmentId}
+              placeholder="Choose department"
+              searchable
+              setForm={setForm}
+            />
           </div>
 
           {/* Date & time */}
           <div className="grid gap-4 md:grid-cols-2">
             <label className="flex flex-col gap-1 text-sm">
               <span className="font-medium text-(--color-text)">
-                Preferred date{" "}
-                <span className="text-(--color-primary)">*</span>
+                Preferred date <span className="text-(--color-primary)">*</span>
               </span>
               <input
                 type="date"
@@ -126,8 +192,7 @@ const RequestAppointmentForm = ({
 
             <label className="flex flex-col gap-1 text-sm">
               <span className="font-medium text-(--color-text)">
-                Preferred time{" "}
-                <span className="text-(--color-primary)">*</span>
+                Preferred time <span className="text-(--color-primary)">*</span>
               </span>
               <input
                 type="time"
@@ -157,8 +222,7 @@ const RequestAppointmentForm = ({
 
           <label className="flex flex-col gap-1 text-sm">
             <span className="font-medium text-(--color-text)">
-              Reason for visit{" "}
-              <span className="text-(--color-primary)">*</span>
+              Reason for visit <span className="text-(--color-primary)">*</span>
             </span>
             <textarea
               name="reason"
@@ -170,16 +234,31 @@ const RequestAppointmentForm = ({
             />
           </label>
 
+          <ErrorOrSuccessMsg
+            successMessage={successMessage}
+            setSuccessMessage={setSuccessMessage}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+          />
+
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-2">
             <p className="text-xs text-(--color-text-muted)">
               Your request will be reviewed by our team. You will receive a
               confirmation once the appointment is scheduled.
             </p>
             <div className="min-w-40">
-              <BgPrimaryBtn
-                text="Request appointment"
-                className="w-full justify-center"
-              />
+              {loading ? (
+                <BgPrimaryBtn
+                  text="Requesting..."
+                  className="w-full justify-center"
+                  disabled
+                />
+              ) : (
+                <BgPrimaryBtn
+                  text="Request appointment"
+                  className="w-full justify-center"
+                />
+              )}
             </div>
           </div>
         </form>
@@ -191,7 +270,9 @@ const RequestAppointmentForm = ({
               What happens next?
             </h3>
             <ul className="space-y-2 text-sm text-(--color-text-muted)">
-              <li>• Our team checks doctor availability for your selected slot.</li>
+              <li>
+                • Our team checks doctor availability for your selected slot.
+              </li>
               <li>• You receive confirmation or alternate time suggestions.</li>
               <li>• Appointment appears in your patient dashboard.</li>
             </ul>

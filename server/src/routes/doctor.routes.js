@@ -3,9 +3,6 @@ import upload from "../middlewares/multer.middleware.js";
 import verifyJWT from "../middlewares/auth.middleware.js";
 import {
   registerDoctor,
-  loginDoctor,
-  logoutDoctor,
-  currentDoctorProfile,
   getDoctorById,
   getAllDoctors,
   updateProfilePic,
@@ -18,14 +15,11 @@ import {
 const router = Router();
 
 router.route("/register").post(upload.single("profilePic"), registerDoctor);
-router.route("/login").post(upload.none(), loginDoctor);
 
 router.route("/find/:id").get(getDoctorById);
 router.route("/allDoctors").get(getAllDoctors); //secure route - only accessible to authenticated doctors
 
 //secure route - only accessible to authenticated doctors
-router.route("/logout").post(verifyJWT, logoutDoctor);
-router.route("/currentDoctor").get(verifyJWT, currentDoctorProfile);
 router
   .route("/updateProfilePic")
   .patch(verifyJWT, upload.single("profilePic"), updateProfilePic);

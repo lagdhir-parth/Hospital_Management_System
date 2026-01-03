@@ -15,7 +15,9 @@ const InfoWithBulletsSection = (props) => {
                 <CircleCheckBig size={20} color="#019a67" />
               )}
             </span>
-            <p className="text-[0.99rem] text-(--color-text-muted)">{bullet.text || bullet}</p>
+            <p className="text-[0.99rem] text-(--color-text-muted)">
+              {bullet.text || bullet}
+            </p>
           </div>
         ))}
       </div>

@@ -34,4 +34,4 @@ const PatientStoriesCard = (props) => {
   );
 };
 
-export default PatientStoriesCard
+export default PatientStoriesCard;

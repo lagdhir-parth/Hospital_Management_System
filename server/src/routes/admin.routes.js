@@ -3,9 +3,6 @@ import upload from "../middlewares/multer.middleware.js";
 import verifyJWT from "../middlewares/auth.middleware.js";
 import {
   createAdmin,
-  loginAdmin,
-  logoutAdmin,
-  getCurrentAdmin,
   getAdminById,
   getAllAdmins,
   updateProfilePic,
@@ -18,13 +15,10 @@ import {
 const router = Router();
 
 router.route("/register").post(upload.single("profilePic"), createAdmin);
-router.route("/login").post(upload.none(), loginAdmin);
 
 router.route("/allAdmins").get(getAllAdmins);
 
 // Secure this route further in future (only super admins should be able to delete admins)
-router.route("/logout").post(verifyJWT, logoutAdmin);
-router.route("/currentAdmin").get(verifyJWT, getCurrentAdmin);
 router
   .route("/updateProfilePic")
   .patch(verifyJWT, upload.single("profilePic"), updateProfilePic);

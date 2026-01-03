@@ -9,7 +9,7 @@ const createDepartment = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden: You don't have permission to perform create action"
+      "Forbidden: You don't have permission to perform create action",
     );
   }
 
@@ -54,20 +54,20 @@ const createDepartment = asyncHandler(async (req, res) => {
   res
     .status(201)
     .json(
-      new ApiResponse(201, "Department created successfully", newDepartment)
+      new ApiResponse(201, "Department created successfully", newDepartment),
     );
 });
 
 const getAllDepartments = asyncHandler(async (req, res) => {
   const departments = await Department.find().populate(
     "headOfDepartment",
-    "name username email" //only bring these three fields from the Doctor document
+    "name username email", //only bring these three fields from the Doctor document
   );
 
   res
     .status(200)
     .json(
-      new ApiResponse(200, "Departments fetched successfully", departments)
+      new ApiResponse(200, "Departments fetched successfully", departments),
     );
 });
 
@@ -75,7 +75,7 @@ const getDepartmentById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const department = await Department.findById(id).populate(
     "headOfDepartment",
-    "name username email"
+    "name username email",
   );
 
   if (!department) {
@@ -93,7 +93,7 @@ const updateDepartmentById = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden: You don't have permission to perform deletion action"
+      "Forbidden: You don't have permission to perform deletion action",
     );
   }
 
@@ -132,7 +132,7 @@ const updateDepartmentById = asyncHandler(async (req, res) => {
     },
     {
       new: true,
-    }
+    },
   );
 
   if (!department) {
@@ -150,7 +150,7 @@ const deleteDepartmentById = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden: You don't have permission to perform deletion action"
+      "Forbidden: You don't have permission to perform deletion action",
     );
   }
 

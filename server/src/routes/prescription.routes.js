@@ -10,7 +10,9 @@ import {
 
 const router = Router();
 
-router.route("/createPrescription").post(verifyJWT, upload.none(), createPrescription);
+router
+  .route("/createPrescription")
+  .post(verifyJWT, upload.none(), createPrescription);
 router.route("/:appointmentId").get(getPrescriptionsByAppointment);
 router
   .route("/:prescriptionId")
