@@ -22,6 +22,10 @@ const patientSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    description: {
+      type: String,
+      required: false,
+    },
     password: {
       type: String,
       required: true,
@@ -72,7 +76,7 @@ const patientSchema = new mongoose.Schema(
       required: false,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 patientSchema.pre("save", async function (next) {
@@ -100,7 +104,7 @@ patientSchema.methods.generateAccessToken = function () {
     process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-    },
+    }
   );
 };
 
@@ -113,7 +117,7 @@ patientSchema.methods.generateRefreshToken = function () {
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-    },
+    }
   );
 };
 

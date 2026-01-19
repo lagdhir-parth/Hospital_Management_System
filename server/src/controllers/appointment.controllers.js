@@ -69,7 +69,7 @@ const requestAppointment = asyncHandler(async (req, res) => {
   res
     .status(201)
     .json(
-      new ApiResponse(201, "Appointment requested successfully", appointment),
+      new ApiResponse(201, "Appointment requested successfully", appointment)
     );
 });
 
@@ -88,7 +88,7 @@ const getAppointmentById = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(
-      new ApiResponse(200, "Appointment retrieved successfully", appointment),
+      new ApiResponse(200, "Appointment retrieved successfully", appointment)
     );
 });
 
@@ -102,7 +102,7 @@ const getAllAppointments = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(
-      new ApiResponse(200, "Appointments retrieved successfully", appointments),
+      new ApiResponse(200, "Appointments retrieved successfully", appointments)
     );
 });
 
@@ -123,8 +123,8 @@ const getDoctorSpecificAppointments = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Doctor's appointments retrieved successfully",
-        appointments,
-      ),
+        appointments
+      )
     );
 });
 
@@ -134,7 +134,12 @@ const getPatientSpecificAppointments = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Only patients can access their appointments");
   }
 
-  const appointments = await Appointment.find({ patientId });
+  const appointments = await Appointment.find({ patientId })
+    .populate("doctorId", "name username")
+    .populate("departmentId", "name")
+    .populate("patientId", "name") // optional
+    .sort({ dateTime: -1 });
+
   if (appointments.length === 0) {
     throw new ApiError(404, "No appointments found for this patient");
   }
@@ -145,8 +150,8 @@ const getPatientSpecificAppointments = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Patient's appointments retrieved successfully",
-        appointments,
-      ),
+        appointments
+      )
     );
 });
 
@@ -167,8 +172,8 @@ const getDepartmentSpecificAppointments = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Department's appointments retrieved successfully",
-        appointments,
-      ),
+        appointments
+      )
     );
 });
 
@@ -194,8 +199,8 @@ const getUserUpcomingAppointments = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Upcoming appointments retrieved successfully",
-        appointments,
-      ),
+        appointments
+      )
     );
 });
 
@@ -222,7 +227,7 @@ const cancelAppointmentById = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(
-      new ApiResponse(200, "Appointment cancelled successfully", appointment),
+      new ApiResponse(200, "Appointment cancelled successfully", appointment)
     );
 });
 
@@ -233,7 +238,7 @@ const updateStatusById = asyncHandler(async (req, res) => {
   if (req.role !== "doctor" && req.role !== "admin") {
     throw new ApiError(
       403,
-      "Only admins or doctors can update appointment status",
+      "Only admins or doctors can update appointment status"
     );
   }
 
@@ -244,7 +249,7 @@ const updateStatusById = asyncHandler(async (req, res) => {
   if (
     !status ||
     !["Requested", "Scheduled", "Completed", "Cancelled", "No-Show"].includes(
-      status,
+      status
     )
   ) {
     throw new ApiError(400, "Valid status is required");
@@ -264,8 +269,8 @@ const updateStatusById = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Appointment status updated successfully",
-        appointment,
-      ),
+        appointment
+      )
     );
 });
 
@@ -288,7 +293,7 @@ const deleteAppointmentById = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(
-      new ApiResponse(200, "Appointment deleted successfully", appointment),
+      new ApiResponse(200, "Appointment deleted successfully", appointment)
     );
 });
 

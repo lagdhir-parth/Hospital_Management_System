@@ -13,7 +13,7 @@ const UserLoginForm = () => {
     role: "",
   });
 
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(false);
@@ -66,6 +66,7 @@ const UserLoginForm = () => {
       setErrorMessage(
         error.response?.data?.message || "Login failed. Please try again."
       );
+      logout();
     } finally {
       setLoading(false);
     }

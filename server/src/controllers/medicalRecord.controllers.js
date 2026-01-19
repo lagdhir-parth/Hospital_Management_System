@@ -6,11 +6,11 @@ import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 
 const createMedicalRecord = asyncHandler(async (req, res) => {
-  const doctorId = req.user._id;
+  const patientId = req.user._id;
   const { appointmentId } = req.params;
 
-  if (req.role !== "doctor") {
-    throw new ApiError(403, "Only doctors can create medical records");
+  if (req.role !== "patient") {
+    throw new ApiError(403, "Only patients can create medical records");
   }
 
   const appointment = await Appointment.findById(appointmentId);
@@ -27,10 +27,11 @@ const createMedicalRecord = asyncHandler(async (req, res) => {
   }
 
   const medicalRecord = await MedicalRecord.create({
-    patientId: appointment.patientId,
-    doctorId: doctorId,
+    patientId: patientId,
+    doctorId: appointment.doctorId,
     appointmentId: appointmentId,
     prescriptionId: null,
+    billId: null,
   });
 
   // push record._id into patient's medicalHistory array
@@ -63,8 +64,9 @@ const getUserMedicalRecords = asyncHandler(async (req, res) => {
 
   const records = await MedicalRecord.find({ [Model]: userId })
     .populate("doctorId", "name specialization")
-    .populate("appointmentId", "dateTime status")
-    .populate("prescriptionId", "medicalSupplies instructions")
+    .populate("appointmentId", "dateTime status reason diseases")
+    .populate("prescriptionId", "_id medicalSupplies instructions notes") // or full prescription data
+    .populate("billId", "amount _id paymentStatus")
     .sort({ createdAt: -1 });
 
   if (records.length === 0) {
@@ -74,42 +76,6 @@ const getUserMedicalRecords = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(new ApiResponse(200, "Medical records fetched", records));
-});
-
-const addPrescriptionToMedicalRecord = asyncHandler(async (req, res) => {
-  if (req.role !== "doctor") {
-    throw new ApiError(
-      403,
-      "Only doctors can add prescriptions to medical records",
-    );
-  }
-
-  const { medicalRecordId } = req.params;
-  const { prescriptionId } = req.body;
-
-  if (!prescriptionId) {
-    throw new ApiError(400, "Prescription ID is required");
-  }
-
-  const medicalRecord = await MedicalRecord.findByIdAndUpdate(
-    medicalRecordId,
-    { prescriptionId },
-    { new: true },
-  );
-
-  if (!medicalRecord) {
-    throw new ApiError(404, "Medical record not found");
-  }
-
-  res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        "Prescription added to medical record successfully",
-        medicalRecord,
-      ),
-    );
 });
 
 const deleteMedicalRecord = asyncHandler(async (req, res) => {
@@ -139,9 +105,4 @@ const deleteMedicalRecord = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Medical record deleted successfully", null));
 });
 
-export {
-  createMedicalRecord,
-  addPrescriptionToMedicalRecord,
-  deleteMedicalRecord,
-  getUserMedicalRecords,
-};
+export { createMedicalRecord, deleteMedicalRecord, getUserMedicalRecords };

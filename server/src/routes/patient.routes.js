@@ -4,7 +4,7 @@ import {
   getAllPatients,
   updateProfilePic,
   updateProfile,
-  updateDiagnosesAndAllergies,
+  updateMedicalInfo,
   updatePassword,
   deleteProfile,
 } from "../controllers/patient.controllers.js";
@@ -32,8 +32,8 @@ router
 router.route("/updateProfile").patch(verifyJWT, upload.none(), updateProfile);
 
 router
-  .route("/updateDiagnosesAndAllergies")
-  .patch(verifyJWT, upload.none(), updateDiagnosesAndAllergies);
+  .route("/updateMedicalInfo")
+  .patch(verifyJWT, upload.none(), updateMedicalInfo);
 
 router.route("/updatePassword").patch(verifyJWT, upload.none(), updatePassword);
 router.route("/deleteProfile").delete(verifyJWT, deleteProfile);

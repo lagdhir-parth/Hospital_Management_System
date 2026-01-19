@@ -11,6 +11,7 @@ const PatientRegisterForm = () => {
     username: "",
     mobile_no: "",
     email: "",
+    description: "",
     password: "",
     age: "",
     bloodGroup: "",
@@ -54,6 +55,7 @@ const PatientRegisterForm = () => {
       { key: "gender", label: "Gender" },
       { key: "diagnoses", label: "Diagnoses", trim: true },
       { key: "address", label: "Address", trim: true },
+      { key: "description", label: "Description", trim: true },
     ];
     for (const { key, label, trim = false } of requiredFields) {
       const value = form[key];
@@ -79,7 +81,7 @@ const PatientRegisterForm = () => {
       const res = await api.post(`/patients/register`, data);
 
       setSuccessMessage(
-        res.data.message || "Patient profile created successfully!",
+        res.data.message || "Patient profile created successfully!"
       );
 
       // Reset form
@@ -88,6 +90,7 @@ const PatientRegisterForm = () => {
         username: "",
         mobile_no: "",
         email: "",
+        description: "",
         password: "",
         age: "",
         bloodGroup: "",
@@ -305,6 +308,17 @@ const PatientRegisterForm = () => {
               className={textareaClasses}
               rows={3}
               placeholder="Street, City, State, PIN"
+            />
+          </FormField>
+
+          <FormField label="Description" name="description" required>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              className={textareaClasses}
+              rows={3}
+              placeholder="Brief description about yourself"
             />
           </FormField>
 

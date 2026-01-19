@@ -89,11 +89,23 @@ export const AuthProvider = ({ children }) => {
     clearTokens();
   };
 
+  const refreshUser = async () => {
+    try {
+      const res = await api.get("/auth/currentUser");
+      setUser(res.data.data);
+      return res.data.data;
+    } catch (error) {
+      console.error("Failed to refresh user data:", error);
+      return null;
+    }
+  };
+
   const value = {
     user,
     tokens,
     login,
     logout,
+    refreshUser,
     isAuthenticated: !!user && !!tokens.accessToken,
     loading,
   };

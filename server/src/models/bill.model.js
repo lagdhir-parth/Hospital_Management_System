@@ -32,7 +32,7 @@ const billSchema = new mongoose.Schema(
       required: false,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const Bill = mongoose.model("Bill", billSchema);

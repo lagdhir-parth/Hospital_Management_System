@@ -90,6 +90,9 @@ const RequestAppointmentForm = () => {
       try {
         const res = await api.post(`/appointments/requestAppointment`, data);
         console.log(res);
+        await api.post(
+          `/medicalRecords/${res.data.data._id}/createMedicalRecord`
+        );
         setSuccessMessage("Appointment requested successfully!");
         setForm({
           doctorId: "",
@@ -102,7 +105,7 @@ const RequestAppointmentForm = () => {
       } catch (error) {
         console.error("Error requesting appointment:", error);
         setErrorMessage(
-          error.response?.data?.message || "Failed to request appointment.",
+          error.response?.data?.message || "Failed to request appointment."
         );
       } finally {
         setLoading(false);

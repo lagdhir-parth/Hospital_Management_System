@@ -1,8 +1,30 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useEffect, useState } from "react";
 
 const SidePanel = ({ props }) => {
+  const [navigateTo, setNavigateTo] = useState("/");
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user?.role) {
+      setNavigateTo("/");
+      console.log("user role not accessed");
+      return;
+    }
+    console.log(user.role);
+    const path =
+      user.role === "patient"
+        ? "/profile/patient"
+        : user.role === "doctor"
+        ? "/profile/doctor"
+        : user.role === "admin"
+        ? "/profile/admin"
+        : "/";
+    setNavigateTo(path);
+    console.log("Nav target:", path, "User:", user.role); // Debug
+  }, [user?.role]); // ✅ Depend on role only
   const navItems = [
     { name: "Home", path: "/" },
     { name: "Services", path: "/services" },
@@ -51,7 +73,7 @@ const SidePanel = ({ props }) => {
 
         {isAuthenticated ? (
           <div className="flex flex-col gap-3 border-t border-(--color-border) mt-4 pt-4">
-            <NavLink to="/profile">
+            <NavLink to={navigateTo}>
               <button
                 onClick={() => {
                   props.setOpen(false);

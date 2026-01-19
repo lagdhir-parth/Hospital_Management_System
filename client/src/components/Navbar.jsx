@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import SidePanel from "./SidePanel";
 import { Hospital, Phone, Menu, ChevronDown } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import userProfilePicPlaceholder from "../assets/userProfilePicPlaceholder.png";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const dropdownRef = useRef(null);
 
@@ -23,7 +23,27 @@ const Navbar = () => {
     { name: "About", path: "/about" },
   ];
 
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [navigateTo, setNavigateTo] = useState("/");
+
+  useEffect(() => {
+    if (!user?.role) {
+      setNavigateTo("/");
+      console.log("user role not accessed");
+      return;
+    }
+    console.log(user.role);
+    const path =
+      user.role === "patient"
+        ? "/profile/patient"
+        : user.role === "doctor"
+          ? "/profile/doctor"
+          : user.role === "admin"
+            ? "/profile/admin"
+            : "/";
+    setNavigateTo(path);
+    console.log("Nav target:", path, "User:", user.role); // Debug
+  }, [user?.role]); // ✅ Depend on role only
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -88,12 +108,15 @@ const Navbar = () => {
               >
                 <div className="flex justify-center items-center border-2 border-(--color-border) rounded-full hover:border-(--color-primary-light) transition-colors duration-200 cursor-pointer">
                   <img
-                    src={user.profilePic || userProfilePicPlaceholder} // TODO: Upload placeholder profile pic in cloudinary
+                    src={
+                      user.profilePic ||
+                      "https://res.cloudinary.com/dflzijhj0/image/upload/v1768822404/userProfilePicPlaceholder_h3etah.jpg"
+                    }
                     alt="Profile"
                     className=" size-10 rounded-full object-cover"
                   />
                 </div>
-                <div className="relative group cursor-pointer">
+                <div className="relative group ">
                   <ChevronDown className="mx-auto mt-1 text-(--color-primary-light)" />
                   {isMenuOpen && (
                     <div className="absolute flex flex-col gap-2 mt-4 -right-1 bg-(--color-surface) border border-(--color-border) rounded-lg shadow-lg w-40 p-2">
@@ -107,18 +130,25 @@ const Navbar = () => {
                       </div>
                       <hr className="border-(--color-text-muted)/50 w-9/10 mx-auto" />
                       <div>
-                        <NavLink
-                          to="/profile"
-                          className="block px-4 py-2 text-(--color-text) hover:bg-gray-200 rounded-lg transition-colors duration-200"
+                        <button
+                          onClick={() => {
+                            setIsMenuOpen(false); // ✅ Close first
+                            navigate(navigateTo); // ✅ Direct for reliability
+                          }}
+                          className="block w-full text-left px-4 py-2 text-(--color-text) hover:bg-gray-200 rounded-lg transition-colors duration-200 cursor-pointer"
                         >
                           Profile
-                        </NavLink>
-                        <NavLink
-                          to="/logout"
-                          className="block px-4 py-2 text-(--color-text) hover:bg-gray-200 rounded-lg transition-colors duration-200"
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            logout(); // From useAuth
+                            navigate("/login");
+                          }}
+                          className="block w-full text-left px-4 py-2 text-(--color-text) hover:bg-gray-200 rounded-lg transition-colors duration-200 cursor-pointer"
                         >
                           Logout
-                        </NavLink>
+                        </button>
                       </div>
                     </div>
                   )}

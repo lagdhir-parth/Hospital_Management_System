@@ -3,6 +3,7 @@ import Appointment from "../models/appointment.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
+import MedicalRecord from "../models/medicalRecord.model.js";
 
 const createPrescription = asyncHandler(async (req, res) => {
   const { appointmentId, medicalSupplies, instructions, notes } = req.body;
@@ -34,6 +35,23 @@ const createPrescription = asyncHandler(async (req, res) => {
     instructions,
     notes,
   });
+
+  const medicalRecord = await MedicalRecord.findOne({
+    patientId: appointment.patientId,
+    doctorId: appointment.doctorId._id, // ✅ Use populated ._id
+    appointmentId: appointment._id, // ✅ KEY: Match exact appointment!
+  });
+
+  // ✅ Update if record exists
+  if (medicalRecord) {
+    medicalRecord.prescriptionId = newPrescription._id;
+    await medicalRecord.save();
+    console.log(
+      `✅ Prescription ${newPrescription._id} attached to MedicalRecord ${medicalRecord._id}`,
+    );
+  } else {
+    console.log(`⚠️ No MedicalRecord found for appointment ${appointmentId}`);
+  }
 
   res
     .status(201)

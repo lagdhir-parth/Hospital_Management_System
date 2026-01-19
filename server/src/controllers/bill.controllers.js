@@ -3,6 +3,7 @@ import Appointment from "../models/appointment.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
+import MedicalRecord from "../models/medicalRecord.model.js";
 
 const createBill = asyncHandler(async (req, res) => {
   const { appointmentId } = req.body || {};
@@ -32,6 +33,23 @@ const createBill = asyncHandler(async (req, res) => {
     paymentStatus: "Pending",
     paymentMethod: null,
   });
+
+  const medicalRecord = await MedicalRecord.findOne({
+    patientId: appointment.patientId,
+    doctorId: appointment.doctorId._id, // ✅ Use populated ._id
+    appointmentId: appointment._id, // ✅ KEY: Match exact appointment!
+  });
+
+  // ✅ Update if record exists
+  if (medicalRecord) {
+    medicalRecord.billId = bill._id;
+    await medicalRecord.save();
+    console.log(
+      `✅ Bill ${bill._id} attached to MedicalRecord ${medicalRecord._id}`,
+    );
+  } else {
+    console.log(`⚠️ No MedicalRecord found for appointment ${appointmentId}`);
+  }
 
   res.status(201).json(new ApiResponse(201, "Bill created successfully", bill));
 });
@@ -68,6 +86,31 @@ const updatePayment = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Payment updated successfully", bill));
 });
 
+const getUserBills = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const role = req.role;
+
+  const roleModelMap = {
+    patient: "Patient",
+    doctor: "Doctor",
+  };
+
+  const modelName = roleModelMap[role];
+
+  let bills;
+  if (modelName) {
+    bills = await Bill.find({ [`${role}Id`]: userId })
+      .populate("doctorId", "name specialization")
+      .populate("appointmentId", "dateTime")
+      .sort({ createdAt: -1 });
+  } else {
+    throw new ApiError(403, "Unauthorized to access bills");
+  }
+  res
+    .status(200)
+    .json(new ApiResponse(200, "Bills retrieved successfully", bills));
+});
+
 const getBillById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -102,4 +145,4 @@ const deleteBill = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, "Bill deleted successfully", bill));
 });
 
-export { createBill, updatePayment, getBillById, deleteBill };
+export { createBill, updatePayment, getUserBills, getBillById, deleteBill };
