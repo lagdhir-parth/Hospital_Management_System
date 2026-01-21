@@ -4,6 +4,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 import MedicalRecord from "../models/medicalRecord.model.js";
+import Doctor from "../models/doctor.model.js";
 
 const createPrescription = asyncHandler(async (req, res) => {
   const { appointmentId, medicalSupplies, instructions, notes } = req.body;

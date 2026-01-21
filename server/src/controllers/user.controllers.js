@@ -107,7 +107,14 @@ const currentUser = asyncHandler(async (req, res) => {
 
   const Model = roleMap[role.toLowerCase()];
 
-  const user = await Model.findById(userId).select("-password -refreshToken");
+  let user = await Model.findById(userId).select("-password -refreshToken");
+
+  // Populate department for doctors only
+  if (role.toLowerCase() === "doctor") {
+    user = await Model.findById(userId)
+      .select("-password -refreshToken")
+      .populate("department");
+  }
 
   if (!user) {
     res.status(404);

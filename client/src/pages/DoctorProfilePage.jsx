@@ -1,9 +1,10 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 
 const DoctorProfilePage = () => {
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      This is Doctor Profile Page
+    <div>
+      <Outlet />
     </div>
   );
 };

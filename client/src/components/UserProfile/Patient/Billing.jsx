@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import api from "../../../api/axios";
-import BillCard from "../BillCard";
+import BillCard from "./BillCard";
 import { AlertCircle, CheckCircle2, Receipt } from "lucide-react";
 
 const Billing = () => {

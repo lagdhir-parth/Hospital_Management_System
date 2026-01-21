@@ -63,6 +63,7 @@ const getUserMedicalRecords = asyncHandler(async (req, res) => {
   }
 
   const records = await MedicalRecord.find({ [Model]: userId })
+    .populate("patientId", "name age gender contactInfo")
     .populate("doctorId", "name specialization")
     .populate("appointmentId", "dateTime status reason diseases")
     .populate("prescriptionId", "_id medicalSupplies instructions notes") // or full prescription data

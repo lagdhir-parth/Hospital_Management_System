@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../api/axios";
-import MedicalRecordCard from "../MedicalRecordCard";
+import MedicalRecordCard from "./MedicalRecordCard";
 
 const MedicalHistory = () => {
   const [medicalRecords, setMedicalRecords] = useState([]);

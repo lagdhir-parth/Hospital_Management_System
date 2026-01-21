@@ -9,6 +9,7 @@ import {
   ClipboardClock,
   House,
   FileText,
+  UserCheck,
 } from "lucide-react";
 
 const DashboardLayout = () => {
@@ -37,10 +38,37 @@ const DashboardLayout = () => {
     { name: "Settings", icon: <Settings size={30} />, path: "settings" },
   ];
 
+  const doctorSidebarOptions = [
+    { name: "Home", icon: <House size={30} />, path: "/" },
+    {
+      name: "Appointments",
+      icon: <ClipboardClock size={30} />,
+      path: "appointments",
+    },
+    {
+      name: "Medical History",
+      icon: <FileText size={30} />,
+      path: "medical-history",
+    },
+    {
+      name: "Treated Patients",
+      icon: <UserCheck size={30} />,
+      path: "treated-patients",
+    },
+    {
+      name: "Profile",
+      icon: <CircleUserRound size={30} />,
+      path: "personal-info",
+    },
+    { name: "Settings", icon: <Settings size={30} />, path: "settings" },
+  ];
+
   const location = useLocation();
   const sidebarOptions = location.pathname.includes("/profile/patient")
     ? patientSidebarOptions
-    : []; // Add other roles' sidebar options as needed
+    : location.pathname.includes("/profile/doctor")
+      ? doctorSidebarOptions
+      : []; // Add other roles' sidebar options as needed
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">

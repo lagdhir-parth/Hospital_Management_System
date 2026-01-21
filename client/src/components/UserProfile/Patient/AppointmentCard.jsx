@@ -40,22 +40,29 @@ const AppointmentCard = ({ appointments = [] }) => {
             <div className="flex items-center gap-2">
               <Calendar className="size-5 text-(--color-primary)" />
               <div>
+                {/* ✅ UTC Date */}
                 <p className="font-semibold text-(--color-text) text-lg">
-                  {new Date(appt.dateTime).toLocaleDateString("en-IN", {
+                  {new Intl.DateTimeFormat("en-IN", {
                     weekday: "short",
                     year: "numeric",
                     month: "short",
                     day: "numeric",
-                  })}
+                    timeZone: "UTC", // UTC timezone
+                  }).format(new Date(appt.dateTime))}
                 </p>
+
+                {/* ✅ UTC Time */}
                 <p className="text-sm text-(--color-text-muted)">
-                  {new Date(appt.dateTime).toLocaleTimeString("en-IN", {
+                  {new Intl.DateTimeFormat("en-IN", {
                     hour: "numeric",
                     minute: "2-digit",
-                  })}
+                    hour12: true, // 12hr format
+                    timeZone: "UTC", // UTC timezone
+                  }).format(new Date(appt.dateTime))}
                 </p>
               </div>
             </div>
+
             <span
               className={`px-3 py-1 rounded-full text-xs font-medium border ${
                 statusColors[appt.status] ||

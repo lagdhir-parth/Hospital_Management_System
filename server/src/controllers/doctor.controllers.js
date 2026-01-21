@@ -21,6 +21,8 @@ const registerDoctor = asyncHandler(async (req, res) => {
     username,
     email,
     password,
+    age,
+    gender,
     specialization,
     qualifications,
     yearsOfExperience,
@@ -38,6 +40,8 @@ const registerDoctor = asyncHandler(async (req, res) => {
       username,
       email,
       password,
+      age,
+      gender,
       specialization,
       qualifications,
       mobileNumber,
@@ -73,7 +77,7 @@ const registerDoctor = asyncHandler(async (req, res) => {
     // upload profile pic to cloudinary
     const cloudinaryResult = await uploadOnCloudinary(
       req.file?.path,
-      "hospital_management_system/patients"
+      "hospital_management_system/patients",
     );
 
     if (!cloudinaryResult) {
@@ -90,6 +94,8 @@ const registerDoctor = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
     email,
     password,
+    age,
+    gender,
     mobileNumber,
     specialization,
     qualifications: qualifications
@@ -107,7 +113,7 @@ const registerDoctor = asyncHandler(async (req, res) => {
   });
 
   const createdDoctor = await Doctor.findById(newDoctor._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken",
   );
 
   if (!createdDoctor) {
@@ -118,14 +124,14 @@ const registerDoctor = asyncHandler(async (req, res) => {
   res
     .status(201)
     .json(
-      new ApiResponse(201, "Doctor registered successfully", createdDoctor)
+      new ApiResponse(201, "Doctor registered successfully", createdDoctor),
     );
 });
 
 const getDoctorById = asyncHandler(async (req, res) => {
   const doctorId = req.params.id;
   const doctor = await Doctor.findById(doctorId).select(
-    "-password -refreshToken"
+    "-password -refreshToken",
   );
   if (!doctor) {
     res.status(404);
@@ -134,6 +140,33 @@ const getDoctorById = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(new ApiResponse(200, "Doctor fetched successfully", doctor));
+});
+
+const getTreatedPatients = asyncHandler(async (req, res) => {
+  const doctorId = req.user._id;
+
+  const doctor = await Doctor.findById(doctorId).populate({
+    path: "treatedPatients",
+    select:
+      "-password -medicalHistory -appointments -prescriptions -refreshToken",
+  });
+
+  if (!doctor) {
+    res.status(404);
+    throw new ApiError(404, "Doctor not found");
+  }
+
+  const treatedPatients = doctor.treatedPatients || [];
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        "Treated patients fetched successfully",
+        treatedPatients,
+      ),
+    );
 });
 
 const getAllDoctors = asyncHandler(async (req, res) => {
@@ -157,7 +190,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only doctors can update their profile picture"
+      "Forbidden! Only doctors can update their profile picture",
     );
   }
 
@@ -185,7 +218,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       if (!delResult) {
         console.warn(
           "Cloudinary deletion returned unexpected result:",
-          delResult
+          delResult,
         );
       }
     } catch (err) {
@@ -195,7 +228,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
 
   const uploadedProfilePic = await uploadOnCloudinary(
     req.file?.path,
-    "hospital_management_system/doctors"
+    "hospital_management_system/doctors",
   );
 
   if (!uploadedProfilePic) {
@@ -209,7 +242,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       profilePic: uploadedProfilePic.url,
       profilePicPublicId: uploadedProfilePic.public_id,
     },
-    { new: true, runValidators: false }
+    { new: true, runValidators: false },
   ).select("-password -refreshToken");
 
   if (!updatedDoctor) {
@@ -223,8 +256,8 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Profile picture updated successfully",
-        updatedDoctor
-      )
+        updatedDoctor,
+      ),
     );
 });
 
@@ -246,6 +279,8 @@ const updateProfile = asyncHandler(async (req, res) => {
     "name",
     "username",
     "mobile_no",
+    "age",
+    "gender",
     "email",
     "address",
     "description",
@@ -277,7 +312,7 @@ const updateProfile = asyncHandler(async (req, res) => {
       400,
       `Doctor with this ${
         existedDoctor.username === updateData.username ? "username" : "email"
-      } already exists`
+      } already exists`,
     );
   }
 
@@ -294,7 +329,11 @@ const updateProfile = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(
-      new ApiResponse(200, "Doctor profile updated successfully", updatedDoctor)
+      new ApiResponse(
+        200,
+        "Doctor profile updated successfully",
+        updatedDoctor,
+      ),
     );
 });
 
@@ -305,7 +344,7 @@ const updateProfessionProfile = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only doctors can update their profession profile"
+      "Forbidden! Only doctors can update their profession profile",
     );
   }
 
@@ -370,7 +409,7 @@ const updateProfessionProfile = asyncHandler(async (req, res) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   ).select("-password -refreshToken");
 
   if (!updatedDoctor) {
@@ -384,8 +423,8 @@ const updateProfessionProfile = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Doctor profession profile updated successfully",
-        updatedDoctor
-      )
+        updatedDoctor,
+      ),
     );
 });
 
@@ -396,7 +435,7 @@ const updatePassword = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only doctors can update their password"
+      "Forbidden! Only doctors can update their password",
     );
   }
 
@@ -461,6 +500,7 @@ const deleteProfile = asyncHandler(async (req, res) => {
 export {
   registerDoctor,
   getDoctorById,
+  getTreatedPatients,
   getAllDoctors,
   updateProfilePic,
   updateProfile,

@@ -66,13 +66,14 @@ const MedicalRecordCard = ({ medicalRecords = [] }) => {
             <div className="flex items-center gap-4 text-right">
               <div className="flex items-center gap-1 text-sm text-(--color-text-muted)">
                 <Calendar className="size-4" />
-                {new Date(
-                  record.appointmentId?.dateTime || record.createdAt,
-                ).toLocaleDateString("en-IN", {
+                {new Intl.DateTimeFormat("en-IN", {
                   year: "numeric",
                   month: "short",
                   day: "numeric",
-                })}
+                  timeZone: "UTC", // UTC timezone
+                }).format(
+                  new Date(record.appointmentId?.dateTime || record.createdAt),
+                )}
               </div>
               {record.appointmentId?.status && (
                 <div
@@ -174,11 +175,12 @@ const MedicalRecordCard = ({ medicalRecords = [] }) => {
           <div className="pt-4 border-t border-(--color-border) text-xs text-(--color-text-muted) flex items-center gap-2">
             <Clock className="size-3" />
             Record created{" "}
-            {new Date(record.createdAt).toLocaleDateString("en-IN", {
+            {new Intl.DateTimeFormat("en-IN", {
+              year: "numeric",
               month: "short",
               day: "numeric",
-              year: "numeric",
-            })}
+              timeZone: "UTC", // UTC timezone
+            }).format(new Date(record.createdAt))}
           </div>
 
           {/* Hover overlay */}

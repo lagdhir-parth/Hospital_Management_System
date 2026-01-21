@@ -3,6 +3,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ProtectedRoutes = ({ isAuthenticated }) => {
+  // FIXME: Re-enable authentication check when backend is ready
   // const location = useLocation();
 
   // useEffect(() => {

@@ -9,7 +9,6 @@ import {
   getPatientSpecificAppointments,
   getDepartmentSpecificAppointments,
   getUserUpcomingAppointments,
-  cancelAppointmentById,
   updateStatusById,
   deleteAppointmentById,
 } from "../controllers/appointment.controllers.js";
@@ -34,10 +33,6 @@ router
 router
   .route("/getUserUpcomingAppointments")
   .get(verifyJWT, getUserUpcomingAppointments);
-
-router
-  .route("/cancelAppointment/:appointmentId")
-  .patch(verifyJWT, upload.none(), cancelAppointmentById);
 router
   .route("/updateStatus/:appointmentId")
   .patch(verifyJWT, upload.none(), updateStatusById);

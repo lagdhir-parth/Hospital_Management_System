@@ -4,6 +4,7 @@ import verifyJWT from "../middlewares/auth.middleware.js";
 import {
   registerDoctor,
   getDoctorById,
+  getTreatedPatients,
   getAllDoctors,
   updateProfilePic,
   updateProfile,
@@ -20,6 +21,9 @@ router.route("/find/:id").get(getDoctorById);
 router.route("/allDoctors").get(getAllDoctors); //secure route - only accessible to authenticated doctors
 
 //secure route - only accessible to authenticated doctors
+
+router.route("/treatedPatients").get(verifyJWT, getTreatedPatients);
+
 router
   .route("/updateProfilePic")
   .patch(verifyJWT, upload.single("profilePic"), updateProfilePic);

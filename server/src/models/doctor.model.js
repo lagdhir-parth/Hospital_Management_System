@@ -22,6 +22,15 @@ const doctorSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    age: {
+      type: Number,
+      required: true,
+    },
+    gender: {
+      type: String,
+      required: true,
+      enum: ["Male", "Female", "Other"],
+    },
     mobileNumber: {
       type: String,
       required: true,
@@ -40,8 +49,9 @@ const doctorSchema = new mongoose.Schema(
       default: 0,
     },
     treatedPatients: {
-      type: Number,
-      default: 0,
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Patient",
+      default: [],
     },
     consultationFee: {
       type: Number,

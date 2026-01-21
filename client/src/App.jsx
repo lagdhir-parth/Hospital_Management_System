@@ -27,6 +27,11 @@ import Billing from "./components/UserProfile/Patient/Billing";
 import Settings from "./components/UserProfile/Patient/Settings";
 import EditProfile from "./components/UserProfile/Patient/EditProfile";
 import { useEffect, useState } from "react";
+import DoctorProfile from "./components/UserProfile/Doctor/DoctorProfile";
+import DoctorAppointment from "./components/UserProfile/Doctor/DoctorAppointment";
+import DoctorMedicalHistory from "./components/UserProfile/Doctor/DoctorMedicalHistory";
+import EditDoctorProfile from "./components/UserProfile/Doctor/EditDoctorProfile";
+import TreatedPatients from "./components/UserProfile/Doctor/TreatedPatients";
 
 const App = () => {
   const { isAuthenticated } = useAuth();
@@ -69,7 +74,25 @@ const App = () => {
               <Route path="edit-patient-profile" element={<EditProfile />} />
             </Route>
           </Route>
-          <Route path="/profile/doctor" element={<DoctorProfilePage />} />
+          <Route path="/profile/doctor" element={<DoctorProfilePage />}>
+            <Route element={<DashboardLayout />}>
+              <Route index element={<DoctorProfile />} />
+              <Route path="appointments" element={<DoctorAppointment />} />
+              <Route
+                path="medical-history"
+                element={<DoctorMedicalHistory />}
+              />
+              <Route path="settings" element={<Settings />} />
+              <Route path="personal-info" element={<DoctorProfile />} />
+              <Route
+                path="edit-doctor-profile"
+                element={<EditDoctorProfile />}
+              />
+              <Route path="treated-patients" element={<TreatedPatients />} />
+
+              {/* Additional doctor-specific routes can be added here */}
+            </Route>
+          </Route>
           <Route path="/profile/admin" element={<AdminProfilePage />} />
         </Route>
 

@@ -7,8 +7,8 @@ import {
   FileText,
   Clock,
 } from "lucide-react";
-import api from "../../api/axios";
-import ErrorOrSuccessMsg from "../ErrorOrSuccessMsg";
+import api from "../../../api/axios";
+import ErrorOrSuccessMsg from "../../ErrorOrSuccessMsg";
 
 const paymentMethodIcons = {
   "Credit Card": CreditCard,
@@ -40,6 +40,7 @@ const BillCard = ({ bills = [], onBillPaid }) => {
     setErrorMessage("");
 
     try {
+      // TODO: Integrate actual payment gateway here
       await api.patch("/bills/updatePayment", {
         billId,
         paymentMethod: "Online Payment",
@@ -119,14 +120,15 @@ const BillCard = ({ bills = [], onBillPaid }) => {
               <div className="flex items-center gap-3 text-sm text-(--color-text-muted)">
                 <Calendar className="size-5 shrink-0" />
                 <span>
-                  {new Date(
-                    bill.appointmentId?.dateTime || bill.createdAt,
-                  ).toLocaleDateString("en-IN", {
+                  {new Intl.DateTimeFormat("en-IN", {
                     weekday: "short",
                     year: "numeric",
                     month: "short",
                     day: "numeric",
-                  })}
+                    timeZone: "UTC", // UTC timezone
+                  }).format(
+                    new Date(bill.appointmentId?.dateTime || bill.createdAt),
+                  )}
                 </span>
               </div>
             </div>
@@ -190,11 +192,12 @@ const BillCard = ({ bills = [], onBillPaid }) => {
             <div className="relative z-10 mt-auto pt-6 border-t border-(--color-border)/50 text-xs text-(--color-text-muted) flex items-center gap-2">
               <Clock className="size-4" />
               Generated{" "}
-              {new Date(bill.createdAt).toLocaleDateString("en-IN", {
+              {new Intl.DateTimeFormat("en-IN", {
+                year: "numeric",
                 month: "short",
                 day: "numeric",
-                year: "numeric",
-              })}
+                timeZone: "UTC", // UTC timezone
+              }).format(new Date(bill.createdAt))}
             </div>
           </div>
         ))}
