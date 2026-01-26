@@ -32,7 +32,6 @@ const Navbar = () => {
       console.log("user role not accessed");
       return;
     }
-    console.log(user.role);
     const path =
       user.role === "patient"
         ? "/profile/patient"
@@ -42,7 +41,6 @@ const Navbar = () => {
             ? "/profile/admin"
             : "/";
     setNavigateTo(path);
-    console.log("Nav target:", path, "User:", user.role); // Debug
   }, [user?.role]); // ✅ Depend on role only
 
   useEffect(() => {
@@ -109,8 +107,7 @@ const Navbar = () => {
                 <div className="flex justify-center items-center border-2 border-(--color-border) rounded-full hover:border-(--color-primary-light) transition-colors duration-200 cursor-pointer">
                   <img
                     src={
-                      user.profilePic ||
-                      "https://res.cloudinary.com/dflzijhj0/image/upload/v1768822404/userProfilePicPlaceholder_h3etah.jpg"
+                      user.profilePic || import.meta.env.VITE_USERPLACEHOLDERIMG
                     }
                     alt="Profile"
                     className=" size-10 rounded-full object-cover"

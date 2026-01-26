@@ -32,6 +32,12 @@ import DoctorAppointment from "./components/UserProfile/Doctor/DoctorAppointment
 import DoctorMedicalHistory from "./components/UserProfile/Doctor/DoctorMedicalHistory";
 import EditDoctorProfile from "./components/UserProfile/Doctor/EditDoctorProfile";
 import TreatedPatients from "./components/UserProfile/Doctor/TreatedPatients";
+import AdminProfile from "./components/UserProfile/Admin/AdminProfile";
+import AdminUserManagement from "./components/UserProfile/Admin/AdminUserManagement";
+import AdminDoctorManagement from "./components/UserProfile/Admin/AdminDoctorManagement";
+import AdminMedicalRecords from "./components/UserProfile/Admin/AdminMedicalRecords";
+import AdminBills from "./components/UserProfile/Admin/AdminBills";
+import AdminDepartmentManagement from "./components/UserProfile/Admin/AdminDepartmentManagement";
 
 const App = () => {
   const { isAuthenticated } = useAuth();
@@ -93,7 +99,24 @@ const App = () => {
               {/* Additional doctor-specific routes can be added here */}
             </Route>
           </Route>
-          <Route path="/profile/admin" element={<AdminProfilePage />} />
+          <Route path="/profile/admin" element={<AdminProfilePage />}>
+            <Route element={<DashboardLayout />}>
+              <Route index element={<AdminProfile />} />
+              <Route path="user-management" element={<AdminUserManagement />} />
+              <Route
+                path="doctor-management"
+                element={<AdminDoctorManagement />}
+              />
+              <Route path="medical-records" element={<AdminMedicalRecords />} />
+              <Route path="bills-and-payments" element={<AdminBills />} />
+              <Route
+                path="department-management"
+                element={<AdminDepartmentManagement />}
+              />
+              <Route path="personal-info" element={<AdminProfile />} />
+              {/* Additional admin-specific routes can be added here */}
+            </Route>
+          </Route>
         </Route>
 
         <Route

@@ -79,7 +79,26 @@ const getUserMedicalRecords = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Medical records fetched", records));
 });
 
+const getAllMedicalRecords = asyncHandler(async (req, res) => {
+  if (req.role !== "admin") {
+    throw new ApiError(403, "Only admins can view all medical records");
+  }
+
+  const records = await MedicalRecord.find()
+    .populate("patientId", "name age gender contactInfo")
+    .populate("doctorId", "name specialization")
+    .populate("appointmentId", "dateTime status reason diseases")
+    .populate("prescriptionId", "_id medicalSupplies instructions notes") // or full prescription data
+    .populate("billId", "amount _id paymentStatus")
+    .sort({ createdAt: -1 });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, "All medical records fetched", records));
+});
+
 const deleteMedicalRecord = asyncHandler(async (req, res) => {
+  // TODO: Also delete associated prescription, bill, appointment if needed
   if (req.role !== "admin") {
     throw new ApiError(403, "Only admins can delete medical records");
   }
@@ -106,4 +125,9 @@ const deleteMedicalRecord = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Medical record deleted successfully", null));
 });
 
-export { createMedicalRecord, deleteMedicalRecord, getUserMedicalRecords };
+export {
+  createMedicalRecord,
+  deleteMedicalRecord,
+  getUserMedicalRecords,
+  getAllMedicalRecords,
+};

@@ -10,6 +10,8 @@ import {
   House,
   FileText,
   UserCheck,
+  Stethoscope,
+  Building2,
 } from "lucide-react";
 
 const DashboardLayout = () => {
@@ -63,12 +65,48 @@ const DashboardLayout = () => {
     { name: "Settings", icon: <Settings size={30} />, path: "settings" },
   ];
 
+  const adminSidebarOptions = [
+    { name: "Home", icon: <House size={30} />, path: "/" },
+    {
+      name: "User Management",
+      icon: <UserCheck size={30} />,
+      path: "user-management",
+    },
+    {
+      name: "Doctor Management",
+      icon: <Stethoscope size={30} />,
+      path: "doctor-management",
+    },
+    {
+      name: "Medical Records",
+      icon: <FileText size={30} />,
+      path: "medical-records",
+    },
+    {
+      name: "Bills and Payments",
+      icon: <ReceiptIndianRupee size={30} />,
+      path: "bills-and-payments",
+    },
+    {
+      name: "Departments",
+      icon: <Building2 size={30} />,
+      path: "department-management",
+    },
+    {
+      name: "Profile",
+      icon: <CircleUserRound size={30} />,
+      path: "personal-info",
+    },
+  ];
+
   const location = useLocation();
   const sidebarOptions = location.pathname.includes("/profile/patient")
     ? patientSidebarOptions
     : location.pathname.includes("/profile/doctor")
       ? doctorSidebarOptions
-      : []; // Add other roles' sidebar options as needed
+      : location.pathname.includes("/profile/admin")
+        ? adminSidebarOptions
+        : []; // Add other roles' sidebar options as needed
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">

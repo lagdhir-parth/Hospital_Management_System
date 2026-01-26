@@ -1,5 +1,5 @@
 import { ChevronDown, Trash2, UserPen } from "lucide-react";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import api from "../../../api/axios";
@@ -16,23 +16,8 @@ const Profile = () => {
   useEffect(() => {
     if (!user) return;
     refreshUser();
-
     const otherDetails = [
-      { label: "Mobile No", value: user?.mobileNumber ?? "N/A" },
-      { label: "Age", value: user?.age ?? "N/A" },
-      { label: "Gender", value: user?.gender ?? "N/A" },
-      { label: "Specialization", value: user?.specialization ?? "N/A" },
-      {
-        label: "Qualifications",
-        value: user?.qualifications?.join(", ") || "N/A",
-      },
-      { label: "Years of Experience", value: user?.yearsOfExperience ?? "N/A" },
-      {
-        label: "Treated Patients Count",
-        value: user?.treatedPatients?.length ?? "N/A",
-      },
-      { label: "Consultation Fee", value: user?.consultationFee ?? "N/A" },
-      { label: "Department", value: user?.department?.name ?? "N/A" },
+      { label: "Mobile No", value: user?.mobile_no ?? "N/A" },
     ];
     setOtherDetails(otherDetails);
   }, [user, refreshUser]);
@@ -55,7 +40,7 @@ const Profile = () => {
 
     setLoading(true);
     try {
-      await api.delete(`/doctors/deleteProfile`);
+      await api.delete(`/admins/delete/${user?.id}`);
       logout();
       navigate("/");
     } catch (error) {
@@ -63,12 +48,6 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const statusColors = {
-    "On Leave": "bg-yellow-100 text-yellow-800 border-yellow-200",
-    Active: "bg-green-100 text-green-800 border-green-200",
-    Inactive: "bg-red-100 text-red-800 border-red-200",
   };
 
   return (
@@ -93,16 +72,9 @@ const Profile = () => {
           <div className="flex-1 w-full space-y-4 text-center lg:text-left">
             {/* Name & Username */}
             <div className="space-y-1">
-              <div className="flex justify-between items-start">
-                <h1 className="text-3xl lg:text-4xl font-bold text-(--color-text) leading-tight">
-                  {user?.name}
-                </h1>
-                <span
-                  className={`${statusColors[user?.status]} flex justify-center items-center px-3 py-1 rounded-full text-sm font-medium border ml-4`}
-                >
-                  {user?.status}
-                </span>
-              </div>
+              <h1 className="text-3xl lg:text-4xl font-bold text-(--color-text) leading-tight">
+                {user?.name}
+              </h1>
               <p className="text-xl text-(--color-primary) font-semibold">
                 @{user?.username}
               </p>
@@ -120,14 +92,6 @@ const Profile = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start pt-4">
-              {/* FIXME: Change with real edit doctor profile route */}
-              <Link
-                to="/profile/patient/edit-patient-profile"
-                className="flex-1 sm:flex-none flex justify-center sm:justify-start items-center px-6 py-3 bg-(--color-primary) text-(--color-light-primary-bg) font-medium rounded-xl hover:bg-(--color-primary-dark) shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
-              >
-                <UserPen className="mr-2 h-5 w-5 shrink-0" />
-                Edit Profile
-              </Link>
               <button
                 onClick={handleDeleteProfile}
                 disabled={loading}
@@ -193,7 +157,7 @@ const Profile = () => {
               className={`overflow-hidden transition-all duration-500 ease-in-out mt-6 ${
                 isDetailsCollapsed
                   ? "max-h-0 opacity-0"
-                  : "min-h-96 opacity-100"
+                  : "max-h-96 opacity-100"
               }`}
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-(--color-border)">

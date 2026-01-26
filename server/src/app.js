@@ -31,6 +31,8 @@ import prescriptionRouter from "./routes/prescription.routes.js";
 import medicalRecordRouter from "./routes/medicalRecords.routes.js";
 import billRouter from "./routes/bill.routes.js";
 import refreshAccessToken from "./middlewares/refreshAccessToken.middleware.js";
+import upload from "./middlewares/multer.middleware.js";
+import sendEmail from "./utils/sendEmail.js";
 
 // Mounting routes
 app.use("/api/auth", userRouter);
@@ -44,6 +46,16 @@ app.use("/api/medicalRecords", medicalRecordRouter);
 app.use("/api/bills", billRouter);
 
 app.get("/api/refresh-token", refreshAccessToken);
+app.post("/api/send-email", upload.none(), async (req, res) => {
+  const { userEmail, subject, msg, to } = req.body || {};
+  req.body = {
+    userEmail,
+    subject: `HMS Contact: ${subject}`,
+    msg,
+    to,
+  };
+  sendEmail(req, res);
+});
 
 // Global Error Handler
 app.use((err, req, res, next) => {

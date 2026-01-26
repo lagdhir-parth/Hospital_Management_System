@@ -127,6 +127,22 @@ const getBillById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Bill retrieved successfully", bill));
 });
 
+const getAllBills = asyncHandler(async (req, res) => {
+  if (req.role !== "admin") {
+    throw new ApiError(403, "Only admins can access all bills");
+  }
+
+  const bills = await Bill.find()
+    .populate("patientId", "name email")
+    .populate("doctorId", "name specialization")
+    .populate("appointmentId", "dateTime")
+    .sort({ createdAt: -1 });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, "All bills retrieved successfully", bills));
+});
+
 const deleteBill = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -145,4 +161,11 @@ const deleteBill = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, "Bill deleted successfully", bill));
 });
 
-export { createBill, updatePayment, getUserBills, getBillById, deleteBill };
+export {
+  createBill,
+  updatePayment,
+  getUserBills,
+  getBillById,
+  getAllBills,
+  deleteBill,
+};

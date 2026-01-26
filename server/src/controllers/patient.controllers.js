@@ -80,7 +80,7 @@ const registerPatient = asyncHandler(async (req, res) => {
       400,
       `Patient with this ${
         patientExists.username === username.trim() ? "username" : "email"
-      } already exists`
+      } already exists`,
     );
   }
 
@@ -92,7 +92,7 @@ const registerPatient = asyncHandler(async (req, res) => {
     // upload profile pic to cloudinary
     const cloudinaryResult = await uploadOnCloudinary(
       req.file?.path,
-      "hospital_management_system/patients"
+      "hospital_management_system/patients",
     );
 
     if (!cloudinaryResult) {
@@ -122,7 +122,7 @@ const registerPatient = asyncHandler(async (req, res) => {
   });
 
   const createdPatient = await Patient.findById(patient._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken",
   );
 
   if (!createdPatient) {
@@ -132,7 +132,7 @@ const registerPatient = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(
-      new ApiResponse(201, "Patient registered successfully", createdPatient)
+      new ApiResponse(201, "Patient registered successfully", createdPatient),
     );
 });
 
@@ -173,7 +173,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only patients can update their profile picture"
+      "Forbidden! Only patients can update their profile picture",
     );
   }
 
@@ -199,7 +199,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       if (!delResult) {
         console.warn(
           "Cloudinary deletion returned unexpected result:",
-          delResult
+          delResult,
         );
       }
     } catch (err) {
@@ -209,7 +209,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
 
   const uploadedProfilePic = await uploadOnCloudinary(
     req.file?.path,
-    "hospital_management_system/patients"
+    "hospital_management_system/patients",
   );
 
   if (!uploadedProfilePic) {
@@ -223,7 +223,7 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       profilePic: uploadedProfilePic.url,
       profilePicPublicId: uploadedProfilePic.public_id,
     },
-    { new: true }
+    { new: true },
   ).select("-password -refreshToken");
 
   return res
@@ -232,8 +232,8 @@ const updateProfilePic = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Profile picture updated successfully",
-        updatedPatient
-      )
+        updatedPatient,
+      ),
     );
 });
 
@@ -244,7 +244,7 @@ const updateProfile = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only patients can update their profile"
+      "Forbidden! Only patients can update their profile",
     );
   }
 
@@ -266,7 +266,7 @@ const updateProfile = asyncHandler(async (req, res) => {
   // Validate update fields
   const updates = Object.keys(updateData);
   const isValidOperation = updates.every(
-    (update) => allowedUpdates.includes(update) && updateData[update] !== ""
+    (update) => allowedUpdates.includes(update) && updateData[update] !== "",
   );
 
   if (!isValidOperation) {
@@ -288,14 +288,14 @@ const updateProfile = asyncHandler(async (req, res) => {
       400,
       `Patient with this ${
         existedPatient.username === updateData.username ? "username" : "email"
-      } already exists`
+      } already exists`,
     );
   }
 
   const updatedPatient = await Patient.findByIdAndUpdate(
     patientId,
     updateData,
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   ).select("-password -refreshToken");
 
   return res
@@ -310,7 +310,7 @@ const updateMedicalInfo = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only patients can update their diagnoses and allergies"
+      "Forbidden! Only patients can update their diagnoses and allergies",
     );
   }
 
@@ -327,7 +327,7 @@ const updateMedicalInfo = asyncHandler(async (req, res) => {
       diagnoses: diagnoses ? diagnoses.split(",").map((d) => d.trim()) : [],
       allergies: allergies ? allergies.split(",").map((a) => a.trim()) : [],
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   ).select("-password -refreshToken");
 
   return res
@@ -336,8 +336,8 @@ const updateMedicalInfo = asyncHandler(async (req, res) => {
       new ApiResponse(
         200,
         "Diagnoses and allergies updated successfully",
-        updatedPatient
-      )
+        updatedPatient,
+      ),
     );
 });
 
@@ -348,7 +348,7 @@ const updatePassword = asyncHandler(async (req, res) => {
     res.status(403);
     throw new ApiError(
       403,
-      "Forbidden! Only patients can update their password"
+      "Forbidden! Only patients can update their password",
     );
   }
 
@@ -385,6 +385,7 @@ const updatePassword = asyncHandler(async (req, res) => {
 });
 
 const deleteProfile = asyncHandler(async (req, res) => {
+  // TODO: Also delete associated data like appointments, bills, medical records, etc.
   const patientId = req.user._id;
 
   const patient = await Patient.findById(patientId);

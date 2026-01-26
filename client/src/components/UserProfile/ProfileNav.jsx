@@ -68,10 +68,7 @@ const ProfileNav = ({ sidebarOptions }) => {
         </div>
         <div>
           <img
-            src={
-              user.profilePic ||
-              "https://res.cloudinary.com/dflzijhj0/image/upload/v1768822404/userProfilePicPlaceholder_h3etah.jpg"
-            }
+            src={user.profilePic || import.meta.env.VITE_USERPLACEHOLDERIMG}
             alt={`${user.name}'s profile`}
             className="size-10 rounded-full"
           />
@@ -88,7 +85,7 @@ const ProfileNav = ({ sidebarOptions }) => {
         onClick={() => setIsSidebarCollapsed(true)}
       >
         <aside
-          className={`h-full w-64 bg-red-500 transform transition-transform duration-300
+          className={`h-full w-min bg-red-500 transform transition-transform duration-300
                 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
         >
           <div className="bg-(--color-primary-dark) h-full p-6 flex flex-col items-start justify-between transition-all duration-300 text-(--color-light-primary-bg)">

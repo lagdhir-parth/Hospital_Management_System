@@ -76,8 +76,7 @@ const Profile = () => {
             <div className="size-32 lg:size-40 rounded-full overflow-hidden border-4 border-(--color-primary) shadow-2xl ring-4 ring-(--color-surface)/50">
               <img
                 src={
-                  user?.profilePic ??
-                  "https://res.cloudinary.com/dflzijhj0/image/upload/v1768822404/userProfilePicPlaceholder_h3etah.jpg"
+                  user?.profilePic ?? import.meta.env.VITE_USERPLACEHOLDERIMG
                 }
                 alt="Profile Picture"
                 className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"

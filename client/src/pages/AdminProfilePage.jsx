@@ -1,9 +1,10 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 
 const AdminProfilePage = () => {
   return (
-    <div className="min-h-screen flex justify-between items-center">
-      This is Admin Profile Page
+    <div>
+      <Outlet />
     </div>
   );
 };

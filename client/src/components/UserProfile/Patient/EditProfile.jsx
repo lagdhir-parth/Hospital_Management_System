@@ -315,18 +315,14 @@ const EditProfile = () => {
                   } mt-2 cursor-pointer hover:border-(--color-primary) transition-colors duration-200`}
                   onClick={handleDivClick}
                 >
-                  {profilePicPreviewUrl ? (
-                    <img
-                      src={profilePicPreviewUrl}
-                      alt="Profile Preview"
-                      className="size-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 text-(--color-text-muted)">
-                      <ImagePlus />
-                      <span className="">No image selected</span>
-                    </div>
-                  )}
+                  <img
+                    src={
+                      profilePicPreviewUrl ||
+                      import.meta.env.VITE_USERPLACEHOLDERIMG
+                    }
+                    alt="Profile Preview"
+                    className="size-full rounded-full object-cover"
+                  />
                 </div>
               </div>
             </div>

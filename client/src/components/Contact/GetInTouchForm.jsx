@@ -3,6 +3,10 @@ import BgPrimaryBtn from "../BgPrimaryBtn";
 import { ChevronDown } from "lucide-react";
 import BgPrimaryLightBtn from "../BgPrimaryLightBtn";
 import CustomDropdown from "../CustomDropdown";
+import api from "../../api/axios.js";
+import { useAuth } from "../../contexts/AuthContext.jsx";
+import { useEffect } from "react";
+import ErrorOrSuccessMsg from "../ErrorOrSuccessMsg.jsx";
 
 const GetInTouchForm = () => {
   const inputClasses =
@@ -10,27 +14,33 @@ const GetInTouchForm = () => {
 
   const labelClasses = "block mb-2 md:mb-4 font-bold md:font-medium";
 
-  const [DropdownOpen, setDropdownOpen] = useState(false);
-  const [dropDownValue, setDropDownValue] = useState(null);
+  const { user, isAuthenticated, refreshUser } = useAuth();
 
-  const departments = [
-    "Cardiology",
-    "Neurology",
-    "Orthopedics",
-    "Pediatrics",
-    "Radiology",
-    "Emergency Medicine",
-  ];
+  const [dropDownValue, setDropDownValue] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    department: dropDownValue,
+    firstName: user?.name || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
+    phoneNumber: user?.mobile_no || "",
     subject: "",
     message: "",
   });
+
+  useEffect(() => {
+    refreshUser(); // To get latest user data
+    setFormData({
+      firstName: user?.name || "",
+      lastName: user?.lastName || "",
+      email: user?.email || "",
+      phoneNumber: user?.mobile_no || "",
+      subject: "",
+      message: "",
+    });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,31 +52,82 @@ const GetInTouchForm = () => {
 
   const handleClear = () => {
     setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
+      firstName: user?.name || "",
+      lastName: user?.lastName || "",
+      email: user?.email || "",
+      phoneNumber: user?.mobile_no || "",
       subject: "",
       message: "",
     });
     setDropDownValue(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted!!!");
-  };
+    setLoading(true);
 
-  const setValue = (value) => {
-    setDropDownValue(value);
-    setFormData((prevData) => ({
-      ...prevData,
-      department: value,
-    }));
+    if (!isAuthenticated) {
+      setErrorMessage("Please log in to send a message.");
+      setLoading(false);
+      return;
+    }
+
+    if (Object.keys(formData).some((key) => !formData[key])) {
+      setErrorMessage("Please fill all the required fields.");
+      setLoading(false);
+      return;
+    }
+
+    // Build HTML email body
+    const htmlMsg = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6;">
+      <h2 style="color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 10px;">New HMS Contact Form Submission</h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr><td style="padding: 12px; border: 1px solid #e5e7eb; background: #f9fafb;"><strong>Full Name:</strong></td><td style="padding: 12px; border: 1px solid #e5e7eb; background: #f9fafb;">${formData.firstName} ${formData.lastName}</td></tr>
+        <tr><td style="padding: 12px; border: 1px solid #e5e7eb; background: #f9fafb;"><strong>Email:</strong></td><td style="padding: 12px; border: 1px solid #e5e7eb; background: #f9fafb;">${formData.email}</td></tr>
+        <tr><td style="padding: 12px; border: 1px solid #e5e7eb; background: #f9fafb;"><strong>Mobile:</strong></td><td style="padding: 12px; border: 1px solid #e5e7eb; background: #f9fafb;">${formData.phoneNumber}</td></tr>
+        <tr><td style="padding: 12px; border: 1px solid #e5e7eb; background: #f9fafb;"><strong>Subject:</strong></td><td style="padding: 12px; border: 1px solid #e5e7eb; background: #f9fafb;">${formData.subject}</td></tr>
+      </table>
+      <div style="background: #f8fafc; padding: 20px; border-left: 4px solid #1e40af; margin-top: 20px;">
+        <strong>Message:</strong><br>${formData.message}
+      </div>
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        Submitted via HMS Contact Form | ${new Date().toLocaleString()}
+      </p>
+    </div>
+  `;
+
+    try {
+      await api.post(
+        "/send-email",
+        {
+          // to: formData.email,
+          name: formData.firstName + " " + formData.lastName,
+          email: formData.email,
+          subject: `HMS Contact Form: ${formData.subject}`,
+          msg: htmlMsg,
+        },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // If protected
+        },
+      );
+
+      setSuccessMessage("Message sent to HMS team! We'll reply soon.");
+      handleClear();
+    } catch (error) {
+      setErrorMessage(
+        error.response?.data?.message || "Failed to send message",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form className="row-span-3 flex flex-col gap-6 p-6 bg-white rounded-2xl border-2 border-(--color-border) h-min my-auto">
+    <form
+      className=" flex flex-col gap-6 p-6 bg-white rounded-2xl border-2 border-(--color-border) h-min my-auto"
+      onSubmit={handleSubmit}
+    >
       <div>
         <h2 className="text-2xl font-extrabold md:font-bold mb-3">
           Get in Touch
@@ -79,7 +140,7 @@ const GetInTouchForm = () => {
         <div className="flex flex-col md:flex-row justify-between gap-4">
           <div>
             <label htmlFor="firstName" className={labelClasses}>
-              First Name:
+              First Name: <span className="text-(--color-primary)">*</span>
             </label>
             <input
               type="text"
@@ -89,12 +150,11 @@ const GetInTouchForm = () => {
               onChange={handleChange}
               className={inputClasses}
               placeholder="Your first name"
-              required
             />
           </div>
           <div>
             <label htmlFor="lastName" className={labelClasses}>
-              Last Name:
+              Last Name: <span className="text-(--color-primary)">*</span>
             </label>
             <input
               type="text"
@@ -104,13 +164,12 @@ const GetInTouchForm = () => {
               onChange={handleChange}
               className={inputClasses}
               placeholder="Your last name"
-              required
             />
           </div>
         </div>
         <div>
           <label htmlFor="email" className={labelClasses}>
-            Email:
+            Email: <span className="text-(--color-primary)">*</span>
           </label>
           <input
             type="email"
@@ -120,12 +179,12 @@ const GetInTouchForm = () => {
             onChange={handleChange}
             className={inputClasses}
             placeholder="Your email address"
-            required
+            // readOnly={isAuthenticated}
           />
         </div>
         <div>
           <label htmlFor="phoneNumber" className={labelClasses}>
-            Phone Number:
+            Phone Number: <span className="text-(--color-primary)">*</span>
           </label>
           <input
             type="tel"
@@ -135,24 +194,13 @@ const GetInTouchForm = () => {
             onChange={handleChange}
             className={inputClasses}
             placeholder="Your phone number"
+            readOnly={isAuthenticated}
           />
         </div>
-        <div>
-          <CustomDropdown
-            setForm={setFormData}
-            options={departments}
-            value={dropDownValue} //TODO: Make Form of it and after that set value from formData
-            placeholder="Select Department"
-            name="department"
-            label="Department"
-            btnClasses={
-              "w-full bg-gray-100 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-400 transition-colors duration-200 text-sm"
-            }
-          />
-        </div>
+
         <div>
           <label htmlFor="subject" className={labelClasses}>
-            Subject:
+            Subject: <span className="text-(--color-primary)">*</span>
           </label>
           <input
             type="text"
@@ -162,12 +210,11 @@ const GetInTouchForm = () => {
             onChange={handleChange}
             className={inputClasses}
             placeholder="Subject of your message"
-            required
           />
         </div>
         <div>
           <label htmlFor="message" className={labelClasses}>
-            Message:
+            Message: <span className="text-(--color-primary)">*</span>
           </label>
           <textarea
             id="message"
@@ -177,14 +224,19 @@ const GetInTouchForm = () => {
             rows="4"
             className={inputClasses}
             placeholder="Type your message here..."
-            required
           ></textarea>
         </div>
+        <ErrorOrSuccessMsg
+          successMessage={successMessage}
+          errorMessage={errorMessage}
+          setSuccessMessage={setSuccessMessage}
+          setErrorMessage={setErrorMessage}
+        />
         <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-10">
           <BgPrimaryBtn
-            onClick={handleSubmit}
             type="submit"
-            text="Send Message"
+            text={loading ? "Sending..." : "Send Message"}
+            disabled={loading}
           />
           <BgPrimaryLightBtn onClick={handleClear} text="Clear" />{" "}
         </div>

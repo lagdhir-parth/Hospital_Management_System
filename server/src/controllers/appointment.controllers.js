@@ -80,11 +80,15 @@ const getAppointmentById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Appointment ID is required");
   }
 
-  const appointment = await Appointment.findById(id);
+  const appointment = await Appointment.findById(id)
+    .populate("patientId", "email name")
+    .populate("doctorId", "name username")
+    .populate("departmentId", "name");
   if (!appointment) {
     throw new ApiError(404, "Appointment not found");
   }
 
+  console.log(appointment);
   res
     .status(200)
     .json(

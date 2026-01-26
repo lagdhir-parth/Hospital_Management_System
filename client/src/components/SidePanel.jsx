@@ -13,17 +13,15 @@ const SidePanel = ({ props }) => {
       console.log("user role not accessed");
       return;
     }
-    console.log(user.role);
     const path =
       user.role === "patient"
         ? "/profile/patient"
         : user.role === "doctor"
-        ? "/profile/doctor"
-        : user.role === "admin"
-        ? "/profile/admin"
-        : "/";
+          ? "/profile/doctor"
+          : user.role === "admin"
+            ? "/profile/admin"
+            : "/";
     setNavigateTo(path);
-    console.log("Nav target:", path, "User:", user.role); // Debug
   }, [user?.role]); // ✅ Depend on role only
   const navItems = [
     { name: "Home", path: "/" },

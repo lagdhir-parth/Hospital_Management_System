@@ -5,6 +5,7 @@ import {
   createMedicalRecord,
   deleteMedicalRecord,
   getUserMedicalRecords,
+  getAllMedicalRecords,
 } from "../controllers/medicalRecord.controllers.js";
 
 const router = Router();
@@ -14,6 +15,8 @@ router
   .post(verifyJWT, createMedicalRecord);
 
 router.route("/userRecords").get(verifyJWT, getUserMedicalRecords);
+
+router.route("/allMedicalRecords").get(verifyJWT, getAllMedicalRecords);
 
 router.route("/:medicalRecordId/delete").delete(verifyJWT, deleteMedicalRecord);
 
