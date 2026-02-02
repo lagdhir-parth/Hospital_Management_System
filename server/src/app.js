@@ -1,9 +1,24 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import compression from "compression";
 
 const app = express();
 
+// Security middleware
+app.use(helmet());
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message:
+      "Too many requests from this IP, please try again after a 15 minute break",
+  }),
+);
+
+// Middleware setup
 app.use(
   cors({
     origin: [
@@ -19,6 +34,7 @@ app.use(express.json({ limit: "16kb" })); // to parse JSON data
 app.use(express.urlencoded({ extended: true })); // to retrive data from URL
 app.use(cookieParser()); // to parse OR CRUD operations of cookies
 app.use(express.static("public")); // to serve static files such as images, CSS files, and JavaScript files
+app.use(compression()); // to compress response bodies for all request that traverse through the middleware
 
 // Importing routes
 import userRouter from "./routes/user.routes.js";

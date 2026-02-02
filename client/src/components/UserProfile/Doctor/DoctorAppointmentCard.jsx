@@ -311,12 +311,9 @@ const DoctorAppointmentCard = ({ appointments = [], setAppointments }) => {
         await api.post(
           "/send-email",
           {
-            to: "unspecifiedperson420@gmail.com",
-            email: "unspecifiedperson420@gmail.com",
-            name: "Unspecified Person",
-            // to: appointment.data.data.patientId.email,
-            // email: appointment.data.data.patientId.email,
-            // name: appointment.data.data.patientId.name,
+            to: appointment.data.data.patientId.email,
+            email: appointment.data.data.patientId.email,
+            name: appointment.data.data.patientId.name,
             subject: `HMS Appointment Update: Your prescription is ready`,
             msg: htmlMsg,
           },
@@ -342,8 +339,6 @@ const DoctorAppointmentCard = ({ appointments = [], setAppointments }) => {
         "/appointments/getDoctorSpecificAppointments",
       );
       setAppointments(response.data.data || []);
-
-      alert("✅ Prescription created successfully!");
     } catch (error) {
       console.error("Error creating prescription:", error);
       alert("Failed to create prescription. Please try again.");

@@ -88,7 +88,6 @@ const getAppointmentById = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Appointment not found");
   }
 
-  console.log(appointment);
   res
     .status(200)
     .json(
