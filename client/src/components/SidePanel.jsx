@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 
 const SidePanel = ({ props }) => {
   const [navigateTo, setNavigateTo] = useState("/");
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user?.role) {
@@ -81,16 +82,16 @@ const SidePanel = ({ props }) => {
                 Profile
               </button>
             </NavLink>
-            <NavLink to="/logout">
-              <button
-                onClick={() => {
-                  props.setOpen(false);
-                }}
-                className="block w-full text-center text-(--color-error) font-semibold border border-gray-600 px-4 py-2 rounded-full"
-              >
-                Logout
-              </button>
-            </NavLink>
+            <button
+              onClick={() => {
+                logout();
+                navigate("/");
+                props.setOpen(false);
+              }}
+              className="block w-full text-center text-(--color-error) font-semibold border border-gray-600 px-4 py-2 rounded-full"
+            >
+              Logout
+            </button>
           </div>
         ) : (
           <div className="border-t border-(--color-border) mt-4 pt-4">
