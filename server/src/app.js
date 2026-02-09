@@ -19,21 +19,17 @@ app.use(
 );
 
 // Middleware setup
-const allowedOrigins = process.env.CORS_ORIGIN.split(",");
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",")
+  : ["http://localhost:5173"];
 
 app.use(
   cors({
-    origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        cb(null, true);
-      } else {
-        cb(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
-);
-// to enable CORS, which allows controlled access to resources located outside of a given domain.
+); // to enable CORS, which allows controlled access to resources located outside of a given domain.
 app.use(express.json({ limit: "16kb" })); // to parse JSON data
 app.use(express.urlencoded({ extended: true })); // to retrive data from URL
 app.use(cookieParser()); // to parse OR CRUD operations of cookies
