@@ -21,11 +21,7 @@ app.use(
 // Middleware setup
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173", // Vite dev server
-      "http://localhost:3000", // Create React App
-      "http://10.71.214.253:5173/", // Your local IP for mobile
-    ],
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
