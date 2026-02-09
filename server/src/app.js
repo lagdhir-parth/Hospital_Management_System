@@ -19,13 +19,11 @@ app.use(
 );
 
 // Middleware setup
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(",")
-  : ["http://localhost:5173"];
+const allowedOrigins = process.env.CORS_ORIGIN;
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: allowedOrigins.split(",").map((origin) => origin.trim()), // to allow requests from specified origins
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
