@@ -73,6 +73,15 @@ app.post("/api/send-email", upload.none(), async (req, res) => {
   sendEmail(req, res);
 });
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error("❌ Global error:", err.stack || err.message);

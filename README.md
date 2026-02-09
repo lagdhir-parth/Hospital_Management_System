@@ -240,6 +240,12 @@ The application provides RESTful API endpoints for:
 - File uploads
 - Email notifications
 
+## API Documentation
+
+You can explore and test the API using Postman:
+
+👉 [Postman Collection](https://www.postman.com/parthlagdhir2007-8738400/workspace/lagdhir-parth-s-workspace/collection/48928563-eb042555-fc44-4781-bdae-11aad61315ce?action=share&creator=48928563&active-environment=48928563-519e235f-f11f-4dd6-93d4-afa134e86a4c)
+
 ## Development Tools
 
 - **ESLint** - Code linting and formatting
