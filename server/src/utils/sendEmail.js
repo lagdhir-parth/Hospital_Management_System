@@ -14,10 +14,10 @@ function createTransporter() {
   const from = process.env.SMTP_FROM;
 
   if (!host || !user || !pass || !from) {
-    throw new ApiError(
-      500,
-      "SMTP configuration is incomplete. Check SMTP_HOST/USER/PASS/FROM.",
-    );
+    return {
+      error: true,
+      message: "SMTP config missing",
+    };
   }
 
   return nodemailer.createTransport({
@@ -25,6 +25,9 @@ function createTransporter() {
     port,
     secure,
     auth: { user, pass },
+    tls: {
+      rejectUnauthorized: false, // prevents cert issues in prod
+    },
   });
 }
 
@@ -45,6 +48,11 @@ const sendEmail = asynchandler(async (req, res) => {
 
   try {
     const transporter = createTransporter();
+    if (transporter?.error) {
+      return res
+        .status(500)
+        .json({ success: false, message: transporter.message });
+    }
     await transporter.sendMail(mailOptions);
     console.log("Email sent successfully");
     res.status(200).json(new ApiResponse(200, "Email sent successfully"));

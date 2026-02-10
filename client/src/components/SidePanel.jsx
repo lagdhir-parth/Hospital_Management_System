@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 const SidePanel = ({ props }) => {
   const [navigateTo, setNavigateTo] = useState("/");
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,8 +32,6 @@ const SidePanel = ({ props }) => {
     { name: "Contact", path: "/contact" },
     { name: "About", path: "/about" },
   ];
-
-  const { isAuthenticated } = useAuth();
 
   return (
     <aside

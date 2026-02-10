@@ -4,44 +4,7 @@ import { Menu, LogOut, X } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const ProfileNav = ({ sidebarOptions }) => {
-  // FIXME: get user from context
-  // const { user } = useAuth();
-
-  const user = {
-    _id: {
-      $oid: "6968e88c67011ce9cbcd966d",
-    },
-    name: "Parth",
-    username: "lagdhir_parth",
-    mobile_no: "9624688925",
-    email: "p@pl.com",
-    description: "hello world",
-    password: "$2b$10$KvMSZc4b3iSwbMg9OD7fsueR8OyxAvTn4a6iJMRcPUXpX3pzRpn2G",
-    age: 18,
-    bloodGroup: "O+",
-    gender: "Male",
-    diagnoses: ["none"],
-    allergies: ["none"],
-    profilePic:
-      "http://res.cloudinary.com/dflzijhj0/image/upload/v1768482953/hospital_management_system/patients/d0bpswdik5u6eippxlji.jpg",
-    profilePicPublicId:
-      "hospital_management_system/patients/d0bpswdik5u6eippxlji",
-    address: "123 street delhi",
-    createdAt: {
-      $date: "2026-01-15T13:15:56.130Z",
-    },
-    updatedAt: {
-      $date: "2026-01-17T06:26:44.295Z",
-    },
-    __v: 0,
-    refreshToken:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTY4ZTg4YzY3MDExY2U5Y2JjZDk2NmQiLCJyb2xlIjoicGF0aWVudCIsImlhdCI6MTc2ODYzMDQxNCwiZXhwIjoxNzY5MjM1MjE0fQ.sTqrXSNOw2-jzQmiFwoAWOPMBMO7UXHY6E_8O1V38MM",
-    medicalHistory: [
-      {
-        $oid: "696b2ba44a64e36dec476aaa",
-      },
-    ],
-  };
+  const { user } = useAuth();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const isOpen = !isSidebarCollapsed;
@@ -70,7 +33,7 @@ const ProfileNav = ({ sidebarOptions }) => {
           <img
             src={user.profilePic || import.meta.env.VITE_USERPLACEHOLDERIMG}
             alt={`${user.name}'s profile`}
-            className="size-10 rounded-full"
+            className="size-10 rounded-full border-2 border-(--color-border) hover:border-(--color-primary-light) transition-colors duration-200"
           />
         </div>
       </nav>

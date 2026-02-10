@@ -67,7 +67,7 @@ const GetInTouchForm = () => {
     setLoading(true);
 
     if (!isAuthenticated) {
-      setErrorMessage("Please log in to send a message.");
+      setErrorMessage("Please login to send a message.");
       setLoading(false);
       return;
     }

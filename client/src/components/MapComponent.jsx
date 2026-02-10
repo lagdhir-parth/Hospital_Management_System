@@ -1,7 +1,15 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css"; // Critical: Import here if not global
-
+import L from "leaflet";
 import { useEffect } from "react";
+
+const markerIcon = new L.Icon({
+  iconUrl: "/leaflet/marker-icon.png",
+  iconRetinaUrl: "/leaflet/marker-icon-2x.png",
+  shadowUrl: "/leaflet/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
 
 const position = [22.3039, 70.8022]; // Rajkot coords
 
@@ -27,7 +35,7 @@ const MapComponent = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
-        <Marker position={position}>
+        <Marker position={position} icon={markerIcon}>
           <Popup>
             <strong>123 Healthcare Drive</strong>
             <br />

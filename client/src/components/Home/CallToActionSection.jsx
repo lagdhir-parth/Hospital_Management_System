@@ -15,7 +15,7 @@ const CallToActionSection = () => {
       </div>
 
       <div className="flex flex-col md:flex-row justify-center items-center gap-6 mb-15 px-4 md:px-0">
-        <Link to="/bookAppointment">
+        <Link to="/bookAppointment" className="w-full md:w-auto">
           <BgPrimaryLightBtn
             text={
               <>
@@ -24,13 +24,15 @@ const CallToActionSection = () => {
             }
           />
         </Link>
-        <BgPrimaryLightBtn
-          text={
-            <>
-              <Phone className="mr-3" /> Call Now
-            </>
-          }
-        />
+        <Link to="tel:+15551234567" className="w-full md:w-auto">
+          <BgPrimaryLightBtn
+            text={
+              <>
+                <Phone className="mr-3" /> Call Now
+              </>
+            }
+          />
+        </Link>
       </div>
       <hr className="self-center border w-8/10 text-white opacity-25 mb-13" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-auto w-9/10 md:w-8/10 self-center pb-10">
