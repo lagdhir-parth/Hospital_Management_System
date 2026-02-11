@@ -37,6 +37,7 @@ Key benefits include:
 - **JWT** (v9.0.2) - JSON Web Token authentication
 - **Bcrypt** (v6.0.0) - Password hashing
 - **Nodemailer** (v7.0.12) - Email sending functionality
+- **Resend** (v6.9.1) - Email sending service
 - **Express rate limit** (v8.2.1) - Rate limiting middleware
 - **Helmet** (v8.1.0) - Security middleware
 - **Compression** (v1.8.1) - Response compression middleware

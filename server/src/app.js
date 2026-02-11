@@ -45,6 +45,7 @@ import billRouter from "./routes/bill.routes.js";
 import refreshAccessToken from "./middlewares/refreshAccessToken.middleware.js";
 import upload from "./middlewares/multer.middleware.js";
 import sendEmail from "./utils/sendEmail.js";
+import sendEmailResend from "./utils/sendEmailResend.js";
 
 // Mounting routes
 app.use("/api/auth", userRouter);
@@ -68,6 +69,7 @@ app.post("/api/send-email", upload.none(), async (req, res) => {
   };
   sendEmail(req, res);
 });
+app.post("/api/send-email-resend", upload.none(), sendEmailResend);
 
 // Health check endpoint
 app.get("/health", (req, res) => {

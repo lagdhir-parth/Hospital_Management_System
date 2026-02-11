@@ -31,6 +31,37 @@ function createTransporter() {
   });
 }
 
+let transporter;
+
+function getTransporter() {
+  if (transporter) return transporter;
+
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT) || 587;
+
+  if (!host || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    throw new Error("SMTP env missing");
+  }
+
+  transporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+  });
+
+  return transporter;
+}
+
 const sendEmail = asynchandler(async (req, res) => {
   const { subject, msg } = req.body || {};
 
@@ -47,7 +78,7 @@ const sendEmail = asynchandler(async (req, res) => {
   };
 
   try {
-    const transporter = createTransporter();
+    const transporter = getTransporter();
     if (transporter?.error) {
       return res
         .status(500)
@@ -63,10 +94,14 @@ const sendEmail = asynchandler(async (req, res) => {
       code: error?.code,
       response: error?.response,
     });
-    throw new ApiError(
-      500,
-      "Error sending email. Please verify SMTP settings.",
-    );
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(
+          500,
+          "Error sending email. Please verify SMTP settings.",
+        ),
+      );
   }
 });
 

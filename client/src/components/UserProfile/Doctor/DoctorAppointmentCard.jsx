@@ -52,93 +52,95 @@ const DoctorAppointmentCard = ({ appointments = [], setAppointments }) => {
         }
       }
 
-      try {
-        const appointment = await api.get(
-          `/appointments/getAppointment/${appointmentId}`,
-        );
+      // TODO: Send email to patient about status change (can be a separate API that generates a nice HTML email based on appointment data and new status) SMTP not working well
 
-        const htmlMsg = `
-           <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-             <div style="text-align: center; margin-bottom: 30px;">
-               <h1 style="color: #1e40af; font-size: 28px; margin: 0; font-weight: 700;">HMS Appointment Update</h1>
-               <p style="color: #64748b; font-size: 16px; margin: 10px 0 0 0;">Your appointment status has been updated</p>
-             </div>
+      // try {
+      //   const appointment = await api.get(
+      //     `/appointments/getAppointment/${appointmentId}`,
+      //   );
 
-             <div style="background: white; padding: 25px; border-radius: 10px; border-left: 5px solid #1e40af; margin-bottom: 25px;">
-               <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
-                 <tr style="background: #f1f5f9;">
-                   <td style="padding: 12px 16px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Patient</td>
-                   <td style="padding: 12px 16px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">${appointment.data.data.patientId.name || appointment.data.data.patientId.email}</td>
-                 </tr>
-                 <tr>
-                   <td style="padding: 12px 16px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Doctor</td>
-                   <td style="padding: 12px 16px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">${appointment.data.data.doctorId.name}</td>
-                 </tr>
-                 <tr style="background: #fef3c7;">
-                   <td style="padding: 12px 16px; font-weight: 600; color: #92400e;">New Status</td>
-                   <td style="padding: 12px 16px; color: #b45309; font-weight: 600; font-size: 16px;">${newStatus.toUpperCase()}</td>
-                 </tr>
-                 <tr>
-                   <td style="padding: 12px 16px; font-weight: 600; color: #374151;">Date & Time</td>
-                   <td style="padding: 12px 16px; color: #6b7280;">${new Date(appointment.data.data.date).toLocaleDateString()} at ${appointment.data.data.time}</td>
-                 </tr>
-                 <tr>
-                   <td style="padding: 12px 16px; font-weight: 600; color: #374151;">Department</td>
-                   <td style="padding: 12px 16px; color: #6b7280;">${appointment.data.data.doctorId.department || "General"}</td>
-                 </tr>
-               </table>
-             </div>
+      //   const htmlMsg = `
+      //      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+      //        <div style="text-align: center; margin-bottom: 30px;">
+      //          <h1 style="color: #1e40af; font-size: 28px; margin: 0; font-weight: 700;">HMS Appointment Update</h1>
+      //          <p style="color: #64748b; font-size: 16px; margin: 10px 0 0 0;">Your appointment status has been updated</p>
+      //        </div>
 
-             <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 25px;">
-               <p style="color: #374151; margin: 0 0 20px 0; font-size: 16px;">
-                 Please arrive 15 minutes early. Bring your ID and insurance details.
-               </p>
-               <div style="display: inline-block; background: #1e40af; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
-                 View Appointment Details
-                </div>
-              </div>
+      //        <div style="background: white; padding: 25px; border-radius: 10px; border-left: 5px solid #1e40af; margin-bottom: 25px;">
+      //          <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+      //            <tr style="background: #f1f5f9;">
+      //              <td style="padding: 12px 16px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Patient</td>
+      //              <td style="padding: 12px 16px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">${appointment.data.data.patientId.name || appointment.data.data.patientId.email}</td>
+      //            </tr>
+      //            <tr>
+      //              <td style="padding: 12px 16px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb;">Doctor</td>
+      //              <td style="padding: 12px 16px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">${appointment.data.data.doctorId.name}</td>
+      //            </tr>
+      //            <tr style="background: #fef3c7;">
+      //              <td style="padding: 12px 16px; font-weight: 600; color: #92400e;">New Status</td>
+      //              <td style="padding: 12px 16px; color: #b45309; font-weight: 600; font-size: 16px;">${newStatus.toUpperCase()}</td>
+      //            </tr>
+      //            <tr>
+      //              <td style="padding: 12px 16px; font-weight: 600; color: #374151;">Date & Time</td>
+      //              <td style="padding: 12px 16px; color: #6b7280;">${new Date(appointment.data.data.date).toLocaleDateString()} at ${appointment.data.data.time}</td>
+      //            </tr>
+      //            <tr>
+      //              <td style="padding: 12px 16px; font-weight: 600; color: #374151;">Department</td>
+      //              <td style="padding: 12px 16px; color: #6b7280;">${appointment.data.data.doctorId.department || "General"}</td>
+      //            </tr>
+      //          </table>
+      //        </div>
 
-              <div style="background: #eff6ff; padding: 20px; border-radius: 10px; border-left: 4px solid #1e40af;">
-                <p style="margin: 0 0 10px 0; color: #1e3a8a; font-weight: 500;">Need Help?</p>
-                <p style="margin: 0; color: #475569; font-size: 14px;">
-                  Contact HMS support: <strong>+1-234-567-8900</strong> | <strong>support@hms.com</strong>
-                </p>
-              </div>
+      //        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 25px;">
+      //          <p style="color: #374151; margin: 0 0 20px 0; font-size: 16px;">
+      //            Please arrive 15 minutes early. Bring your ID and insurance details.
+      //          </p>
+      //          <div style="display: inline-block; background: #1e40af; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+      //            View Appointment Details
+      //           </div>
+      //         </div>
 
-              <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                <p style="color: #9ca3af; font-size: 13px; margin: 0;">
-                  This is an automated message from Hospital Management System (HMS).<br>
-                  ${new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}
-                </p>
-              </div>
-            </div>
-          `;
-        setLoading(true);
+      //         <div style="background: #eff6ff; padding: 20px; border-radius: 10px; border-left: 4px solid #1e40af;">
+      //           <p style="margin: 0 0 10px 0; color: #1e3a8a; font-weight: 500;">Need Help?</p>
+      //           <p style="margin: 0; color: #475569; font-size: 14px;">
+      //             Contact HMS support: <strong>+1-234-567-8900</strong> | <strong>support@hms.com</strong>
+      //           </p>
+      //         </div>
 
-        await api.post(
-          "/send-email",
-          {
-            to: appointment.data.data.patientId.email,
-            email: appointment.data.data.patientId.email,
-            name: appointment.data.data.patientId.name,
-            subject: `HMS Appointment Update: Your appointment is now ${newStatus}`,
-            msg: htmlMsg,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            }, // If protected
-          },
-        );
+      //         <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+      //           <p style="color: #9ca3af; font-size: 13px; margin: 0;">
+      //             This is an automated message from Hospital Management System (HMS).<br>
+      //             ${new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}
+      //           </p>
+      //         </div>
+      //       </div>
+      //     `;
+      //   setLoading(true);
 
-        alert("Message sent to Patient!");
-      } catch (error) {
-        console.log(error);
-        console.log(error.response?.data?.message || "Failed to send message");
-        alert(error.response?.data?.message || "Failed to send message");
-      } finally {
-        setLoading(false);
-      }
+      //   await api.post(
+      //     "/send-email",
+      //     {
+      //       to: appointment.data.data.patientId.email,
+      //       email: appointment.data.data.patientId.email,
+      //       name: appointment.data.data.patientId.name,
+      //       subject: `HMS Appointment Update: Your appointment is now ${newStatus}`,
+      //       msg: htmlMsg,
+      //     },
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //       }, // If protected
+      //     },
+      //   );
+
+      //   alert("Message sent to Patient!");
+      // } catch (error) {
+      //   console.log(error);
+      //   console.log(error.response?.data?.message || "Failed to send message");
+      //   alert(error.response?.data?.message || "Failed to send message");
+      // } finally {
+      //   setLoading(false);
+      // }
 
       // Optimistic update
       setAppointments((prev) =>
@@ -189,149 +191,151 @@ const DoctorAppointmentCard = ({ appointments = [], setAppointments }) => {
         notes: prescriptionForm.notes,
       });
 
-      try {
-        const appointment = await api.get(
-          `/appointments/getAppointment/${selectedAppointment._id}`,
-        );
+      // TODO: Send email to patient with prescription details (can be a separate API that generates a nice HTML email based on prescription data) SMTP not working well
 
-        const htmlMsg = `
-<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.12);">
-  
-  <!-- Header -->
-  <div style="text-align: center; margin-bottom: 35px; padding-bottom: 25px; border-bottom: 3px solid #10b981;">
-    <h1 style="color: #10b981; font-size: 32px; margin: 0 0 10px 0; font-weight: 800;">✅ Prescription Ready</h1>
-    <p style="color: #64748b; font-size: 18px; margin: 0; font-weight: 500;">Your medications from Dr. ${appointment.data.data.doctorId.name}</p>
-  </div>
+      //       try {
+      //         const appointment = await api.get(
+      //           `/appointments/getAppointment/${selectedAppointment._id}`,
+      //         );
 
-  <!-- Prescription Header -->
-  <div style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 2px solid #d1fae5;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <div>
-        <h3 style="color: #065f46; margin: 0 0 5px 0; font-size: 22px;">📋 Prescription RX-${Math.floor(Math.random() * 10000) + 1000}</h3>
-        <p style="color: #6b7280; margin: 0; font-size: 15px;">Issued: ${new Date().toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })} | ${new Date().toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" })}</p>
-      </div>
-      <div style="text-align: right;">
-        <p style="color: #10b981; font-weight: 700; margin: 0 0 2px 0; font-size: 18px;">Dr. ${appointment.data.data.doctorId.name}</p>
-        <p style="color: #6b7280; font-size: 14px; margin: 0;">${appointment.data.data.doctorId.department || "Specialist"}</p>
-      </div>
-    </div>
-  </div>
+      //         const htmlMsg = `
+      // <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.12);">
 
-  <!-- Medications Table - Fixed for your formData -->
-  <div style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-    <h3 style="color: #065f46; margin: 0 0 20px 0; font-size: 22px; font-weight: 700;">💊 Prescribed Medications</h3>
-    <table style="width: 100%; border-collapse: collapse; font-size: 16px;">
-      <thead>
-        <tr style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
-          <th style="padding: 16px 14px; text-align: left; font-weight: 600;">Medication</th>
-          <th style="padding: 16px 14px; text-align: left; font-weight: 600;">Dosage / Instructions</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${prescriptionForm.medicalSupplies
-          .split(",")
-          .map((med) => med.trim())
-          .filter(Boolean)
-          .map(
-            (med, index) => `
-            <tr style="${index % 2 === 0 ? "background: #f0fdf4;" : ""} border-bottom: 1px solid #d1fae5;">
-              <td style="padding: 16px 14px; font-weight: 600; color: #065f46;">${med}</td>
-              <td style="padding: 16px 14px; color: #166534;">Follow doctor's instructions</td>
-            </tr>
-          `,
-          )
-          .join("")}
-      </tbody>
-    </table>
-  </div>
+      //   <!-- Header -->
+      //   <div style="text-align: center; margin-bottom: 35px; padding-bottom: 25px; border-bottom: 3px solid #10b981;">
+      //     <h1 style="color: #10b981; font-size: 32px; margin: 0 0 10px 0; font-weight: 800;">✅ Prescription Ready</h1>
+      //     <p style="color: #64748b; font-size: 18px; margin: 0; font-weight: 500;">Your medications from Dr. ${appointment.data.data.doctorId.name}</p>
+      //   </div>
 
-  <!-- Instructions - Prominent Warning -->
-  <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 25px; border-radius: 12px; border-left: 6px solid #d97706; margin-bottom: 25px;">
-    <h3 style="color: #92400e; margin: 0 0 18px 0; font-size: 20px; font-weight: 700;">⚠️ Usage Instructions</h3>
-    <div style="background: white; padding: 22px; border-radius: 10px; border: 2px dashed #f59e0b;">
-      <p style="margin: 0 0 12px 0; color: #92400e; line-height: 1.7; font-size: 16px; font-weight: 500;">
-        ${prescriptionForm.instructions.replace(/\n/g, "<br>")}
-      </p>
-      ${
-        prescriptionForm.notes
-          ? `
-        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #fed7aa; padding-left: 20px;">
-          <p style="margin: 0; color: #b45309; font-style: italic; font-size: 15px;">
-            <strong>📝 Doctor's Notes:</strong> ${prescriptionForm.notes.replace(/\n/g, "<br>")}
-          </p>
-        </div>
-      `
-          : ""
-      }
-    </div>
-  </div>
+      //   <!-- Prescription Header -->
+      //   <div style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 2px solid #d1fae5;">
+      //     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      //       <div>
+      //         <h3 style="color: #065f46; margin: 0 0 5px 0; font-size: 22px;">📋 Prescription RX-${Math.floor(Math.random() * 10000) + 1000}</h3>
+      //         <p style="color: #6b7280; margin: 0; font-size: 15px;">Issued: ${new Date().toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" })} | ${new Date().toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" })}</p>
+      //       </div>
+      //       <div style="text-align: right;">
+      //         <p style="color: #10b981; font-weight: 700; margin: 0 0 2px 0; font-size: 18px;">Dr. ${appointment.data.data.doctorId.name}</p>
+      //         <p style="color: #6b7280; font-size: 14px; margin: 0;">${appointment.data.data.doctorId.department || "Specialist"}</p>
+      //       </div>
+      //     </div>
+      //   </div>
 
-  <!-- Action Cards -->
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-    <div style="background: white; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid #dbeafe;">
-      <div style="background: #eff6ff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
-        <svg style="width: 28px; height: 28px; fill: #1e40af;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-      </div>
-      <h4 style="color: #1e3a8a; margin: 0 0 8px 0; font-size: 18px; font-weight: 700;">Follow Instructions</h4>
-      <p style="color: #475569; margin: 0; font-size: 14px;">Complete full course</p>
-    </div>
-    <div style="background: white; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid #dcfce7;">
-      <div style="background: #f0fdf4; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
-        <svg style="width: 28px; height: 28px; fill: #16a34a;" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      </div>
-      <h4 style="color: #166534; margin: 0 0 8px 0; font-size: 18px; font-weight: 700;">Contact if Issues</h4>
-      <p style="color: #475569; margin: 0; font-size: 14px;">Side effects? Call doctor</p>
-    </div>
-  </div>
+      //   <!-- Medications Table - Fixed for your formData -->
+      //   <div style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+      //     <h3 style="color: #065f46; margin: 0 0 20px 0; font-size: 22px; font-weight: 700;">💊 Prescribed Medications</h3>
+      //     <table style="width: 100%; border-collapse: collapse; font-size: 16px;">
+      //       <thead>
+      //         <tr style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+      //           <th style="padding: 16px 14px; text-align: left; font-weight: 600;">Medication</th>
+      //           <th style="padding: 16px 14px; text-align: left; font-weight: 600;">Dosage / Instructions</th>
+      //         </tr>
+      //       </thead>
+      //       <tbody>
+      //         ${prescriptionForm.medicalSupplies
+      //           .split(",")
+      //           .map((med) => med.trim())
+      //           .filter(Boolean)
+      //           .map(
+      //             (med, index) => `
+      //             <tr style="${index % 2 === 0 ? "background: #f0fdf4;" : ""} border-bottom: 1px solid #d1fae5;">
+      //               <td style="padding: 16px 14px; font-weight: 600; color: #065f46;">${med}</td>
+      //               <td style="padding: 16px 14px; color: #166534;">Follow doctor's instructions</td>
+      //             </tr>
+      //           `,
+      //           )
+      //           .join("")}
+      //       </tbody>
+      //     </table>
+      //   </div>
 
-  <!-- Final CTA -->
-  <div style="background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 8px 25px rgba(16,185,129,0.15);">
-    <p style="color: #065f46; margin: 0 0 25px 0; font-size: 17px; font-weight: 600;">
-      Questions about your prescription? Contact us immediately.
-    </p>
-    <div style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 16px 45px; border-radius: 12px; font-weight: 700; font-size: 17px; box-shadow: 0 6px 20px rgba(16,185,129,0.3); text-decoration: none;">
-      Call Doctor Now
-    </div>
-  </div>
+      //   <!-- Instructions - Prominent Warning -->
+      //   <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 25px; border-radius: 12px; border-left: 6px solid #d97706; margin-bottom: 25px;">
+      //     <h3 style="color: #92400e; margin: 0 0 18px 0; font-size: 20px; font-weight: 700;">⚠️ Usage Instructions</h3>
+      //     <div style="background: white; padding: 22px; border-radius: 10px; border: 2px dashed #f59e0b;">
+      //       <p style="margin: 0 0 12px 0; color: #92400e; line-height: 1.7; font-size: 16px; font-weight: 500;">
+      //         ${prescriptionForm.instructions.replace(/\n/g, "<br>")}
+      //       </p>
+      //       ${
+      //         prescriptionForm.notes
+      //           ? `
+      //         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #fed7aa; padding-left: 20px;">
+      //           <p style="margin: 0; color: #b45309; font-style: italic; font-size: 15px;">
+      //             <strong>📝 Doctor's Notes:</strong> ${prescriptionForm.notes.replace(/\n/g, "<br>")}
+      //           </p>
+      //         </div>
+      //       `
+      //           : ""
+      //       }
+      //     </div>
+      //   </div>
 
-  <!-- Footer -->
-  <div style="text-align: center; padding-top: 30px; border-top: 3px solid #d1fae5;">
-    <p style="color: #9ca3af; font-size: 15px; margin: 0 0 12px 0; font-weight: 500;">
-      Hospital Management System (HMS) | Digital Prescription Portal
-    </p>
-    <p style="color: #6b7280; font-size: 14px; margin: 0;">
-      Emergency: <strong>108</strong> | Support: <strong>+91-XXXXXXXXXX</strong> | <strong>pharmacy@hms.in</strong>
-    </p>
-  </div>
-</div>
-`;
+      //   <!-- Action Cards -->
+      //   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+      //     <div style="background: white; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid #dbeafe;">
+      //       <div style="background: #eff6ff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+      //         <svg style="width: 28px; height: 28px; fill: #1e40af;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      //       </div>
+      //       <h4 style="color: #1e3a8a; margin: 0 0 8px 0; font-size: 18px; font-weight: 700;">Follow Instructions</h4>
+      //       <p style="color: #475569; margin: 0; font-size: 14px;">Complete full course</p>
+      //     </div>
+      //     <div style="background: white; padding: 25px; border-radius: 12px; text-align: center; border: 2px solid #dcfce7;">
+      //       <div style="background: #f0fdf4; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+      //         <svg style="width: 28px; height: 28px; fill: #16a34a;" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      //       </div>
+      //       <h4 style="color: #166534; margin: 0 0 8px 0; font-size: 18px; font-weight: 700;">Contact if Issues</h4>
+      //       <p style="color: #475569; margin: 0; font-size: 14px;">Side effects? Call doctor</p>
+      //     </div>
+      //   </div>
 
-        setLoading(true);
+      //   <!-- Final CTA -->
+      //   <div style="background: white; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 8px 25px rgba(16,185,129,0.15);">
+      //     <p style="color: #065f46; margin: 0 0 25px 0; font-size: 17px; font-weight: 600;">
+      //       Questions about your prescription? Contact us immediately.
+      //     </p>
+      //     <div style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 16px 45px; border-radius: 12px; font-weight: 700; font-size: 17px; box-shadow: 0 6px 20px rgba(16,185,129,0.3); text-decoration: none;">
+      //       Call Doctor Now
+      //     </div>
+      //   </div>
 
-        await api.post(
-          "/send-email",
-          {
-            to: appointment.data.data.patientId.email,
-            email: appointment.data.data.patientId.email,
-            name: appointment.data.data.patientId.name,
-            subject: `HMS Appointment Update: Your prescription is ready`,
-            msg: htmlMsg,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            }, // If protected
-          },
-        );
+      //   <!-- Footer -->
+      //   <div style="text-align: center; padding-top: 30px; border-top: 3px solid #d1fae5;">
+      //     <p style="color: #9ca3af; font-size: 15px; margin: 0 0 12px 0; font-weight: 500;">
+      //       Hospital Management System (HMS) | Digital Prescription Portal
+      //     </p>
+      //     <p style="color: #6b7280; font-size: 14px; margin: 0;">
+      //       Emergency: <strong>108</strong> | Support: <strong>+91-XXXXXXXXXX</strong> | <strong>pharmacy@hms.in</strong>
+      //     </p>
+      //   </div>
+      // </div>
+      // `;
 
-        alert("Message sent to Patient!");
-      } catch (error) {
-        console.log(error);
-        console.log(error.response?.data?.message || "Failed to send message");
-        alert(error.response?.data?.message || "Failed to send message");
-      } finally {
-        setLoading(false);
-      }
+      //         setLoading(true);
+
+      //         await api.post(
+      //           "/send-email",
+      //           {
+      //             to: appointment.data.data.patientId.email,
+      //             email: appointment.data.data.patientId.email,
+      //             name: appointment.data.data.patientId.name,
+      //             subject: `HMS Appointment Update: Your prescription is ready`,
+      //             msg: htmlMsg,
+      //           },
+      //           {
+      //             headers: {
+      //               Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //             }, // If protected
+      //           },
+      //         );
+
+      //         alert("Message sent to Patient!");
+      //       } catch (error) {
+      //         console.log(error);
+      //         console.log(error.response?.data?.message || "Failed to send message");
+      //         alert(error.response?.data?.message || "Failed to send message");
+      //       } finally {
+      //         setLoading(false);
+      //       }
 
       // Close modal + refresh appointments
       setShowPrescriptionModal(false);

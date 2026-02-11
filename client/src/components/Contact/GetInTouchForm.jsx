@@ -99,11 +99,10 @@ const GetInTouchForm = () => {
 
     try {
       await api.post(
-        "/send-email",
+        "/send-email-resend",
         {
           // to: formData.email,
-          name: formData.firstName + " " + formData.lastName,
-          email: formData.email,
+          userEmail: formData.email,
           subject: `HMS Contact Form: ${formData.subject}`,
           msg: htmlMsg,
         },
